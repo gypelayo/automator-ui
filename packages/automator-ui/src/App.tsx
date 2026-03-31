@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect } from 'react'
 import { registerAllTemplates } from '@/templates'
 import { getAllTemplates as getCoreTemplates, getTemplate as getCoreTemplate } from '@automator/core'
 import { useConfigStore } from '@/store/config'
@@ -8,10 +8,8 @@ import { TemplateForm } from '@/components/builder/TemplateForm'
 import { TemplateBuilder } from '@/components/builder/TemplateBuilder'
 import { OutputPanel } from '@/components/output/OutputPanel'
 
-// Force template registration at module load time
-console.log('About to register templates...')
+// Register templates once at module level
 registerAllTemplates()
-console.log('Templates registered at module load')
 
 // Helper to get template (checks both core and custom)
 function getTemplate(id: string) {
@@ -25,34 +23,15 @@ function getAllTemplates() {
 }
 
 export default function App() {
-  const [debug, setDebug] = useState<string[]>([])
-  const initialized = useRef(false)
   const { activeTemplateId, setActiveTemplate, isEditMode, editingTemplateId, setEditMode } = useConfigStore()
-  // Subscribe to template store to ensure re-renders
-  const templates = useTemplateStore((state) => state.templates)
-  void templates // Avoid unused warning
+  useTemplateStore((state) => state.templates)
 
   useEffect(() => {
-    if (initialized.current) return
-    initialized.current = true
-    
     const templates = getAllTemplates()
-    const ids = templates.map(t => t.id)
-    setDebug(['templates found: ' + templates.length, 'ids: ' + ids.join(', '), 'activeTemplateId: ' + activeTemplateId])
-    
     if (!activeTemplateId && templates[0]) {
       setActiveTemplate(templates[0].id)
     }
-  }, []) // No deps - run once on mount
-
-  if (debug.length > 0) {
-    return (
-      <div style={{ padding: 20, background: '#111', color: '#0f0', fontFamily: 'monospace' }}>
-        {debug.map((d, i) => <div key={i}>{d}</div>)}
-        <div>activeTemplateId: {activeTemplateId}</div>
-      </div>
-    )
-  }
+  }, [activeTemplateId])
 
   const handleEditSave = () => {
     setEditMode(false)
