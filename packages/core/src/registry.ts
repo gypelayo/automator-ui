@@ -3,6 +3,7 @@ import type { Template } from './types'
 const registry = new Map<string, Template>()
 
 export function registerTemplate(template: Template): void {
+  console.log('[registry] registering:', template.id, template.name)
   registry.set(template.id, template)
 }
 
@@ -11,5 +12,6 @@ export function getTemplate(id: string, customTemplates: Template[] = []): Templ
 }
 
 export function getAllTemplates(customTemplates: Template[] = []): Template[] {
+  console.log('[registry] getAllTemplates, count in registry:', registry.size)
   return [...Array.from(registry.values()), ...customTemplates]
 }
