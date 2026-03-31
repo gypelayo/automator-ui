@@ -26,7 +26,9 @@ export default function App() {
   const [debug, setDebug] = useState<string[]>([])
   const initialized = useRef(false)
   const { activeTemplateId, setActiveTemplate, isEditMode, editingTemplateId, setEditMode } = useConfigStore()
-  const _customTemplates = useTemplateStore((state) => state.templates) // Keep subscription to trigger re-render
+  // Subscribe to template store to ensure re-renders
+  const templates = useTemplateStore((state) => state.templates)
+  void templates // Avoid unused warning
 
   useEffect(() => {
     if (initialized.current) return
