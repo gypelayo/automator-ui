@@ -19,15 +19,49 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-      - run: npm ci
-      - run: npm run build
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build automator-ui
+        run: pnpm --filter @automator/automator-ui build
+
+      - name: Build trip-planner
+        run: pnpm --filter @automator/trip-planner build
+
+      # Merge both dist outputs into a single pages/ directory
+      # automator-ui  → pages/automator-ui/
+      # trip-planner  → pages/trip-planner/
+      - name: Assemble pages artifact
+        run: |
+          mkdir -p pages/automator-ui pages/trip-planner
+          cp -r packages/automator-ui/dist/. pages/automator-ui/
+          cp -r packages/trip-planner/dist/. pages/trip-planner/
+          # Root index redirects to automator-ui
+          cat > pages/index.html <<'EOF'
+          <!doctype html>
+          <html>
+            <head>
+              <meta charset="UTF-8" />
+              <meta http-equiv="refresh" content="0; url=./automator-ui/" />
+              <title>Automator</title>
+            </head>
+            <body>Redirecting...</body>
+          </html>
+          EOF
+
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: pages
 
   deploy:
     needs: build
