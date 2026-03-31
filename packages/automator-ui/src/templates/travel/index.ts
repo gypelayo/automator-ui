@@ -1,5 +1,7 @@
-import type { Template, FieldValues, BudgetEntry } from '@automator/core'
-import { section, formatMultiSelect } from '@automator/core'
+import type { Template, FieldValues } from '@automator/core'
+import { section } from '@automator/core'
+
+const ACC_LABELS = ['', 'Budget', 'Economy', 'Mid-range', 'Upscale', 'Luxury']
 
 export const travelTemplate: Template = {
   id: 'travel-planner',
@@ -27,19 +29,65 @@ export const travelTemplate: Template = {
           default: '',
         },
         {
+          type: 'select',
+          id: 'date_mode',
+          label: 'Date flexibility',
+          description: 'Fixed: you have specific dates. Flexible: you want the AI to find the best window.',
+          options: ['Fixed dates', 'Flexible dates'],
+          default: 'Fixed dates',
+        },
+        {
           type: 'text',
-          id: 'dates',
-          label: 'Travel dates',
-          description: 'Start and end dates for the trip',
-          placeholder: 'e.g. June 10 – June 18, 2025',
+          id: 'departure_date',
+          label: 'Departure date',
+          placeholder: 'e.g. 2025-06-10',
           default: '',
         },
         {
           type: 'text',
-          id: 'travelers',
-          label: 'Travelers',
-          placeholder: 'e.g. 2 adults, 1 child (8yo)',
+          id: 'return_date',
+          label: 'Return date',
+          placeholder: 'e.g. 2025-06-18',
           default: '',
+        },
+        {
+          type: 'textarea',
+          id: 'flexible_dates',
+          label: 'Flexible date intent',
+          description: 'Only used when Date flexibility is set to "Flexible dates"',
+          placeholder: 'e.g. Whenever is cheapest in the next 2 months, ideally 7–10 days',
+          default: '',
+          rows: 2,
+        },
+      ],
+    },
+    {
+      id: 'travelers',
+      title: 'Travelers',
+      description: 'Who is coming on this trip',
+      fields: [
+        {
+          type: 'slider',
+          id: 'adults',
+          label: 'Adults',
+          min: 1,
+          max: 10,
+          step: 1,
+          default: 2,
+          minLabel: '1',
+          maxLabel: '10',
+        },
+        {
+          type: 'slider',
+          id: 'children',
+          label: 'Children',
+          description: 'Under 18',
+          min: 0,
+          max: 8,
+          step: 1,
+          default: 0,
+          minLabel: '0',
+          maxLabel: '8',
         },
       ],
     },
@@ -48,13 +96,6 @@ export const travelTemplate: Template = {
       title: 'Getting There',
       description: 'How you want to travel to the destination',
       fields: [
-        {
-          type: 'multi-select',
-          id: 'transport_modes',
-          label: 'Preferred transport',
-          options: ['Flight', 'Train', 'Bus', 'Car', 'Ferry'],
-          default: ['Flight'],
-        },
         {
           type: 'select',
           id: 'flight_class',
@@ -69,20 +110,6 @@ export const travelTemplate: Template = {
           description: 'Avoid layovers even if it costs more',
           default: false,
         },
-        {
-          type: 'toggle',
-          id: 'rent_car',
-          label: 'Rent a car',
-          description: 'Include car rental in the plan',
-          default: false,
-        },
-        {
-          type: 'toggle',
-          id: 'open_jaw',
-          label: 'Open-jaw flights OK',
-          description: 'Fly into one city and out of another',
-          default: false,
-        },
       ],
     },
     {
@@ -91,16 +118,9 @@ export const travelTemplate: Template = {
       description: 'Where you want to stay',
       fields: [
         {
-          type: 'multi-select',
-          id: 'accommodation_types',
-          label: 'Accommodation types',
-          options: ['Hotel', 'Airbnb', 'Hostel', 'Resort', 'Boutique', 'Villa'],
-          default: ['Hotel'],
-        },
-        {
           type: 'slider',
           id: 'accommodation_style',
-          label: 'Accommodation style',
+          label: 'Accommodation tier',
           description: 'From budget to luxury',
           min: 1,
           max: 5,
@@ -109,19 +129,18 @@ export const travelTemplate: Template = {
           minLabel: 'Budget',
           maxLabel: 'Luxury',
         },
+      ],
+    },
+    {
+      id: 'budget',
+      title: 'Budget',
+      fields: [
         {
-          type: 'toggle',
-          id: 'central_location',
-          label: 'Central location priority',
-          description: 'Prefer hotels close to the city centre even at higher cost',
-          default: true,
-        },
-        {
-          type: 'budget-split',
-          id: 'hotel_budget',
-          label: 'Hotel budget by night group',
-          description: 'Set different budgets for different stretches of the trip',
-          entries: [],
+          type: 'text',
+          id: 'max_budget',
+          label: 'Max total budget',
+          placeholder: 'e.g. $3,000 USD',
+          default: '',
         },
       ],
     },
@@ -186,13 +205,6 @@ export const travelTemplate: Template = {
           maxLabel: 'Pack it in',
         },
         {
-          type: 'toggle',
-          id: 'multi_city',
-          label: 'Open to multi-city',
-          description: 'Willing to visit nearby cities or regions during the trip',
-          default: false,
-        },
-        {
           type: 'multi-select',
           id: 'activities',
           label: 'Preferred activities',
@@ -213,36 +225,49 @@ export const travelTemplate: Template = {
       ],
     },
     {
-      id: 'budget',
-      title: 'Budget & Constraints',
+      id: 'sustainability',
+      title: 'Sustainability',
+      description: 'Carbon and eco preferences',
       fields: [
         {
-          type: 'text',
-          id: 'total_budget',
-          label: 'Total trip budget',
-          placeholder: 'e.g. $3,000 USD',
-          default: '',
-        },
-        {
-          type: 'select',
-          id: 'budget_priority',
-          label: 'Budget priority',
-          description: 'Where to spend vs. save',
-          options: ['Balanced', 'Spend on flights, save on hotels', 'Save on flights, spend on hotels', 'Spend on experiences', 'Minimize everything'],
-          default: 'Balanced',
-        },
-        {
           type: 'toggle',
-          id: 'travel_insurance',
-          label: 'Include travel insurance',
-          description: 'Factor in travel insurance in the recommendations',
+          id: 'prioritise_low_carbon',
+          label: 'Prefer lower-carbon options',
+          description: 'Prefer direct flights, flag train alternatives for short routes',
           default: false,
         },
         {
+          type: 'toggle',
+          id: 'show_carbon_estimate',
+          label: 'Show carbon estimates',
+          description: 'Include approximate CO₂ footprint (kg/person) for each flight',
+          default: true,
+        },
+        {
+          type: 'toggle',
+          id: 'offset_carbon',
+          label: 'Include carbon offset cost',
+          description: 'Add estimated offset cost (~$15–20/tonne CO₂) to trip total',
+          default: false,
+        },
+        {
+          type: 'toggle',
+          id: 'eco_accommodation',
+          label: 'Prefer eco-certified accommodation',
+          description: 'Prioritise hotels with Green Key, EU Ecolabel, or B Corp certification',
+          default: false,
+        },
+      ],
+    },
+    {
+      id: 'notes',
+      title: 'Additional Notes',
+      fields: [
+        {
           type: 'textarea',
           id: 'notes',
-          label: 'Additional notes',
-          placeholder: 'Any dietary needs, accessibility requirements, things to avoid, specific preferences...',
+          label: 'Notes',
+          placeholder: 'Dietary needs, accessibility requirements, things to avoid, specific preferences...',
           default: '',
           rows: 4,
         },
@@ -254,100 +279,99 @@ export const travelTemplate: Template = {
     const v = values as Record<string, unknown>
     const lines: string[] = []
 
-    lines.push(`# Travel Planner Configuration\n`)
+    lines.push('# Trip Planner Configuration\n')
 
-    // Objective
+    // --- Objective ---
     const dest = v['destination'] as string
     const origin = v['origin'] as string
-    const dates = v['dates'] as string
-    const travelers = v['travelers'] as string
+    const dateMode = v['date_mode'] as string
+    const departureDate = v['departure_date'] as string
+    const returnDate = v['return_date'] as string
+    const flexibleDates = v['flexible_dates'] as string
+    const adults = (v['adults'] as number) ?? 2
+    const children = (v['children'] as number) ?? 0
 
     const objectiveLines: string[] = []
     if (dest) objectiveLines.push(`- **Destination**: ${dest}`)
-    if (origin) objectiveLines.push(`- **From**: ${origin}`)
-    if (dates) objectiveLines.push(`- **Dates**: ${dates}`)
-    if (travelers) objectiveLines.push(`- **Travelers**: ${travelers}`)
+    if (origin) objectiveLines.push(`- **Departing from**: ${origin}`)
+
+    if (dateMode === 'Flexible dates') {
+      if (flexibleDates?.trim()) {
+        objectiveLines.push(`- **Flexible dates**: ${flexibleDates}`)
+        objectiveLines.push('  (Find the best date combination that fits this constraint — optimise for lowest price and/or longest stay within budget)')
+      }
+    } else {
+      if (departureDate) objectiveLines.push(`- **Departure date**: ${departureDate}`)
+      if (returnDate) objectiveLines.push(`- **Return date**: ${returnDate}`)
+    }
+
+    const travelerParts = [
+      `${adults} adult${adults !== 1 ? 's' : ''}`,
+      children > 0 ? `${children} child${children !== 1 ? 'ren' : ''}` : '',
+    ].filter(Boolean)
+    objectiveLines.push(`- **Travelers**: ${travelerParts.join(', ')}`)
 
     lines.push(section('Objective', objectiveLines.join('\n') || '_Not specified_'))
 
-    // Tools
-    lines.push(
-      section(
-        'Tools',
-        [
-          '- **Flight search**: Search and compare flights (read-only)',
-          '- **Hotel search**: Search and compare accommodations (read-only)',
-          '- **Activity search**: Search tours, activities, and experiences (read-only)',
-          '- **Maps**: Look up locations, distances, transit options (read-only)',
-          '- **Weather**: Check weather forecasts for the destination (read-only)',
-          ...(v['rent_car'] ? ['- **Car rental search**: Search and compare car rentals (read-only)'] : []),
-        ].join('\n'),
-      ),
-    )
+    // --- Travel Preferences ---
+    const travelLines: string[] = []
+    const flightClass = v['flight_class'] as string
+    if (flightClass) travelLines.push(`- **Flight class**: ${flightClass}`)
+    if (v['direct_only']) travelLines.push('- **Direct flights only**: Yes — avoid layovers even at higher cost')
+    else travelLines.push('- **Direct flights only**: No — layovers acceptable if price is significantly lower')
 
-    // Constraints (sliders + toggles)
-    const constraintLines: string[] = []
-    const adv = v['adventure'] as number
-    const beach = v['beach'] as number
-    const culture = v['culture'] as number
-    const food = v['food'] as number
-    const pace = v['pace'] as number
+    const accStyle = (v['accommodation_style'] as number) ?? 3
+    travelLines.push(`- **Accommodation tier**: ${ACC_LABELS[accStyle] ?? accStyle}`)
 
-    constraintLines.push(`- **Adventure level**: ${adv}/10 (${adv <= 3 ? 'relaxed' : adv <= 6 ? 'moderate' : 'adventurous'})`)
-    constraintLines.push(`- **Beach time**: ${beach}/10 (${beach <= 3 ? 'minimal' : beach <= 6 ? 'some' : 'lots'})`)
-    constraintLines.push(`- **Culture & history**: ${culture}/10 (${culture <= 3 ? 'low priority' : culture <= 6 ? 'moderate' : 'high priority'})`)
-    constraintLines.push(`- **Food & dining focus**: ${food}/10 (${food <= 3 ? 'casual' : food <= 6 ? 'moderate' : 'foodie-driven'})`)
-    constraintLines.push(`- **Trip pace**: ${pace}/10 (${pace <= 3 ? 'slow and relaxed' : pace <= 6 ? 'moderate' : 'fast-paced, pack in as much as possible'})`)
+    const maxBudget = v['max_budget'] as string
+    if (maxBudget?.trim()) travelLines.push(`- **Max total budget**: ${maxBudget}`)
 
-    if (v['direct_only']) constraintLines.push('- **Flights**: Direct flights only, no layovers')
-    if (v['central_location']) constraintLines.push('- **Accommodation**: Prioritise central locations')
-    if (v['multi_city']) constraintLines.push('- **Itinerary**: Open to visiting nearby cities or regions')
-    if (v['open_jaw']) constraintLines.push('- **Flights**: Open-jaw flights are acceptable')
-    if (v['travel_insurance']) constraintLines.push('- Include travel insurance in recommendations')
+    lines.push(section('Travel Preferences', travelLines.join('\n')))
 
-    lines.push(section('Constraints', constraintLines.join('\n')))
+    // --- Experience Profile ---
+    const adv = (v['adventure'] as number) ?? 5
+    const beach = (v['beach'] as number) ?? 5
+    const culture = (v['culture'] as number) ?? 5
+    const food = (v['food'] as number) ?? 7
+    const pace = (v['pace'] as number) ?? 5
 
-    // Parameters
-    const paramLines: string[] = []
-
-    const transport = v['transport_modes'] as string[]
-    if (transport?.length) paramLines.push(`- **Transport modes**: ${formatMultiSelect(transport)}`)
-    paramLines.push(`- **Flight class**: ${v['flight_class'] as string}`)
-    if (v['rent_car']) paramLines.push('- **Car rental**: Yes, include in plan')
-
-    const accTypes = v['accommodation_types'] as string[]
-    if (accTypes?.length) paramLines.push(`- **Accommodation types**: ${formatMultiSelect(accTypes)}`)
-
-    const accStyle = v['accommodation_style'] as number
-    const accLabels = ['', 'Budget', 'Economy', 'Mid-range', 'Upscale', 'Luxury']
-    paramLines.push(`- **Accommodation tier**: ${accLabels[accStyle] ?? accStyle}`)
-
-    const budgetPriority = v['budget_priority'] as string
-    if (budgetPriority) paramLines.push(`- **Budget priority**: ${budgetPriority}`)
-
-    const totalBudget = v['total_budget'] as string
-    if (totalBudget?.trim()) paramLines.push(`- **Total budget**: ${totalBudget}`)
-
+    const expLines: string[] = [
+      `- **Adventure level**: ${adv}/10 (${adv <= 3 ? 'relaxed' : adv <= 6 ? 'moderate' : 'adventurous'})`,
+      `- **Beach time**: ${beach}/10 (${beach <= 3 ? 'minimal' : beach <= 6 ? 'some' : 'lots'})`,
+      `- **Culture & history**: ${culture}/10 (${culture <= 3 ? 'low priority' : culture <= 6 ? 'moderate' : 'high priority'})`,
+      `- **Food & dining**: ${food}/10 (${food <= 3 ? 'casual' : food <= 6 ? 'moderate' : 'foodie-driven'})`,
+      `- **Trip pace**: ${pace}/10 (${pace <= 3 ? 'slow & relaxed' : pace <= 6 ? 'moderate' : 'fast-paced'})`,
+    ]
     const activities = v['activities'] as string[]
-    if (activities?.length) paramLines.push(`- **Preferred activities**: ${formatMultiSelect(activities)}`)
+    if (activities?.length) expLines.push(`- **Preferred activities**: ${activities.join(', ')}`)
 
-    const hotelBudget = v['hotel_budget'] as BudgetEntry[]
-    if (hotelBudget?.length) {
-      paramLines.push('- **Hotel budget by period**:')
-      hotelBudget.forEach((e) => paramLines.push(`  - ${e.label}: $${e.amount.toLocaleString()}/night`))
+    lines.push(section('Experience Profile', expLines.join('\n')))
+
+    // --- Sustainability ---
+    const sustainLines: string[] = []
+    if (v['prioritise_low_carbon']) sustainLines.push('- **Prefer lower-carbon options**: Where possible, prefer direct flights over connecting ones, and flag train alternatives if the route is under ~6h by rail. Factor carbon impact into recommendations.')
+    if (v['show_carbon_estimate']) sustainLines.push('- **Carbon estimates**: Include an approximate CO₂ footprint (kg per person) for each flight option.')
+    if (v['offset_carbon']) sustainLines.push('- **Carbon offset**: Include an estimated carbon offset cost (via typical offset schemes ~$15–20/tonne CO₂) in the total trip cost.')
+    if (v['eco_accommodation']) sustainLines.push('- **Eco accommodation**: Prefer hotels with recognised sustainability certifications (e.g. Green Key, EU Ecolabel, B Corp). Flag which properties have these.')
+    if (sustainLines.length > 0) {
+      lines.push(section('Sustainability', sustainLines.join('\n')))
     }
 
-    lines.push(section('Parameters', paramLines.join('\n')))
+    // --- Instructions ---
+    const instructionLines: string[] = []
+    if (dateMode === 'Flexible dates') {
+      instructionLines.push('The user has flexible dates. Your first priority is to identify the optimal travel window that maximises value — either lowest total cost, longest possible stay, or best combination of both — within the constraints described.')
+    }
+    instructionLines.push('Search for real-time flight and hotel options using the available tools.')
+    instructionLines.push('Present at least 2-3 flight alternatives and at least 3 hotel options across different price points.')
+    instructionLines.push('Flag trade-offs explicitly (e.g. cheaper flight with a long layover, better-located hotel at higher cost).')
+    if (maxBudget?.trim()) instructionLines.push(`Respect the budget of ${maxBudget}. Clearly flag any option that exceeds it.`)
 
-    // Instructions
     const notes = v['notes'] as string
-    const instructionLines = [
-      'Search for real options and present a structured itinerary with clear options at each decision point.',
-      'For each major cost (flights, accommodation, activities), provide at least 2-3 alternatives.',
-      'Flag any trade-offs explicitly — e.g. a cheaper flight with a long layover, or a better-located hotel at higher cost.',
-      'Respect the budget constraints strictly. Do not recommend options that exceed the stated budget without flagging it.',
-    ]
-    if (notes?.trim()) instructionLines.push(`\n**Additional notes from user**:\n${notes}`)
+    if (notes?.trim()) {
+      instructionLines.push('')
+      instructionLines.push(`**Additional notes from traveller**: ${notes}`)
+    }
 
     lines.push(section('Instructions', instructionLines.join('\n')))
 
