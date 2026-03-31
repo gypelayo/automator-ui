@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { registerAllTemplates } from '@/templates'
 import { getAllTemplates as getCoreTemplates, getTemplate as getCoreTemplate } from '@automator/core'
 import { useConfigStore } from '@/store/config'
@@ -23,15 +23,27 @@ function getAllTemplates() {
 }
 
 export default function App() {
+  const [debug, setDebug] = useState<string[]>([])
   const { activeTemplateId, setActiveTemplate, isEditMode, editingTemplateId, setEditMode } = useConfigStore()
   const customTemplates = useTemplateStore((state) => state.templates)
 
   useEffect(() => {
+    setDebug(['getAllTemplates() called...'])
     const templates = getAllTemplates()
+    setDebug(d => [...d, `found ${templates.length} templates`])
     if (!activeTemplateId && templates[0]) {
       setActiveTemplate(templates[0].id)
     }
   }, [activeTemplateId, customTemplates])
+
+  if (debug.length > 0) {
+    return (
+      <div style={{ padding: 20, background: '#111', color: '#0f0', fontFamily: 'monospace' }}>
+        {debug.map((d, i) => <div key={i}>{d}</div>)}
+        <div>activeTemplateId: {activeTemplateId}</div>
+      </div>
+    )
+  }
 
   const handleEditSave = () => {
     setEditMode(false)
