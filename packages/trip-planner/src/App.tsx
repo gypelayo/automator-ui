@@ -138,11 +138,11 @@ export default function App() {
 /** Floating Run button shown in the top bar (mirrors the one in TripForm) */
 function RunButton() {
   const { status, panelOpen } = useRunStore()
-  const { compile } = useTripStore()
-  const { destination, origin, departureDate } = useTripStore((s) => s.config)
+  const compile = useTripStore((s) => s.compile)
+  const isReady = useTripStore((s) => s.isReady)
 
   const running = status === 'running'
-  const ready = destination.trim() && origin.trim() && departureDate
+  const ready = isReady()
 
   if (panelOpen && status !== 'idle') return null
 
@@ -156,7 +156,7 @@ function RunButton() {
       {running ? (
         <>
           <span className="animate-spin inline-block w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full" />
-          Running
+          Searching
         </>
       ) : (
         <>
