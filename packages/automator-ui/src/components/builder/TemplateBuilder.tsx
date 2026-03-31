@@ -35,17 +35,16 @@ function generateId(): string {
 }
 
 interface FieldEditorProps {
-  templateId: string
-  sectionId: string
   field: FieldSchema
+  onUpdate: (updates: Partial<FieldSchema>) => void
+  onDelete: () => void
 }
 
-function FieldEditor({ templateId, sectionId, field }: FieldEditorProps) {
-  const { updateField, deleteField } = useTemplateStore()
+function FieldEditor({ field, onUpdate, onDelete }: FieldEditorProps) {
   const [expanded, setExpanded] = useState(false)
 
   const handleUpdate = (updates: Partial<FieldSchema>) => {
-    updateField(templateId, sectionId, field.id, updates)
+    onUpdate(updates)
   }
 
   return (
@@ -245,7 +244,7 @@ function FieldEditor({ templateId, sectionId, field }: FieldEditorProps) {
             <Button 
               variant="destructive" 
               size="sm"
-              onClick={() => deleteField(templateId, sectionId, field.id)}
+              onClick={onDelete}
             >
               <Trash2 size={14} className="mr-1" /> Delete Field
             </Button>
@@ -257,53 +256,27 @@ function FieldEditor({ templateId, sectionId, field }: FieldEditorProps) {
 }
 
 interface SectionEditorProps {
-  templateId: string
   section: SectionSchema
+  onUpdate: (updates: Partial<SectionSchema>) => void
+  onDelete: () => void
+  onAddField: (type: FieldSchema['type']) => void
+  onUpdateField: (fieldId: string, updates: Partial<FieldSchema>) => void
+  onDeleteField: (fieldId: string) => void
 }
 
-function SectionEditor({ templateId, section }: SectionEditorProps) {
-  const { addField, deleteSection, updateSection } = useTemplateStore()
+function SectionEditor({ section, onUpdate, onDelete, onAddField, onUpdateField, onDeleteField }: SectionEditorProps) {
   const [expanded, setExpanded] = useState(true)
   const [showAddField, setShowAddField] = useState(false)
   const [newFieldType, setNewFieldType] = useState<FieldSchema['type']>('text')
 
   const handleAddField = () => {
-    const baseField: Partial<FieldSchema> = {
-      id: generateId(),
-      label: 'New Field',
-    }
-
-    switch (newFieldType) {
-      case 'text':
-        Object.assign(baseField, { type: 'text', placeholder: '', default: '' })
-        break
-      case 'textarea':
-        Object.assign(baseField, { type: 'textarea', placeholder: '', default: '', rows: 3 })
-        break
-      case 'toggle':
-        Object.assign(baseField, { type: 'toggle', description: '', default: false })
-        break
-      case 'slider':
-        Object.assign(baseField, { type: 'slider', min: 0, max: 10, step: 1, default: 5 })
-        break
-      case 'select':
-        Object.assign(baseField, { type: 'select', options: ['Option 1'], default: 'Option 1' })
-        break
-      case 'multi-select':
-        Object.assign(baseField, { type: 'multi-select', options: ['Option 1'], default: [] })
-        break
-      case 'budget-split':
-        Object.assign(baseField, { type: 'budget-split', entries: [] })
-        break
-    }
-
-    addField(templateId, section.id, baseField as FieldSchema)
+    onAddField(newFieldType)
     setShowAddField(false)
   }
 
   return (
     <div className="border rounded-lg bg-card mb-4">
-      <div 
+      <div
         className="flex items-center gap-2 p-3 cursor-pointer bg-muted/30 rounded-t-lg"
         onClick={() => setExpanded(!expanded)}
       >
@@ -317,34 +290,30 @@ function SectionEditor({ templateId, section }: SectionEditorProps) {
         <div className="p-3 space-y-3 border-t">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Section ID</label>
-              <Input 
-                value={section.id}
-                onChange={(e) => updateSection(templateId, section.id, { id: e.target.value })}
+              <label className="text-xs font-medium text-muted-foreground">Title</label>
+              <Input
+                value={section.title}
+                onChange={(e) => onUpdate({ title: e.target.value })}
+                placeholder="Section title"
+                onClick={(e) => e.stopPropagation()}
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Title</label>
-              <Input 
-                value={section.title}
-                onChange={(e) => updateSection(templateId, section.id, { title: e.target.value })}
+              <label className="text-xs font-medium text-muted-foreground">Description</label>
+              <Input
+                value={section.description || ''}
+                onChange={(e) => onUpdate({ description: e.target.value })}
+                placeholder="Optional description"
+                onClick={(e) => e.stopPropagation()}
               />
             </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground">Description</label>
-            <Input 
-              value={section.description || ''}
-              onChange={(e) => updateSection(templateId, section.id, { description: e.target.value })}
-            />
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-medium text-muted-foreground">Fields</label>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => setShowAddField(!showAddField)}
               >
@@ -354,7 +323,7 @@ function SectionEditor({ templateId, section }: SectionEditorProps) {
 
             {showAddField && (
               <div className="flex gap-2 p-2 bg-muted/30 rounded">
-                <select 
+                <select
                   value={newFieldType}
                   onChange={(e) => setNewFieldType(e.target.value as FieldSchema['type'])}
                   className="flex-1 px-2 py-1 text-sm border rounded bg-background"
@@ -375,11 +344,11 @@ function SectionEditor({ templateId, section }: SectionEditorProps) {
             ) : (
               <div className="space-y-2">
                 {section.fields.map(field => (
-                  <FieldEditor 
+                  <FieldEditor
                     key={field.id}
-                    templateId={templateId}
-                    sectionId={section.id}
                     field={field}
+                    onUpdate={(updates) => onUpdateField(field.id, updates)}
+                    onDelete={() => onDeleteField(field.id)}
                   />
                 ))}
               </div>
@@ -387,10 +356,10 @@ function SectionEditor({ templateId, section }: SectionEditorProps) {
           </div>
 
           <div className="flex justify-end pt-2 border-t">
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               size="sm"
-              onClick={() => deleteSection(templateId, section.id)}
+              onClick={onDelete}
             >
               <Trash2 size={14} className="mr-1" /> Delete Section
             </Button>
@@ -409,7 +378,6 @@ interface TemplateBuilderProps {
 
 export function TemplateBuilder({ templateId, onSave, onCancel }: TemplateBuilderProps) {
   const { templates, addTemplate, updateTemplate, deleteTemplate } = useTemplateStore()
-  
   const existingTemplate = templateId ? templates.find(t => t.id === templateId) : null
   const [name, setName] = useState(existingTemplate?.name || 'New Template')
   const [description, setDescription] = useState(existingTemplate?.description || '')
@@ -489,7 +457,53 @@ export function TemplateBuilder({ templateId, onSave, onCancel }: TemplateBuilde
       description: '',
       fields: [],
     }
-    setSections([...sections, newSection])
+    setSections((prev) => [...prev, newSection])
+  }
+
+  const handleUpdateSection = (sectionId: string, updates: Partial<SectionSchema>) => {
+    setSections((prev) =>
+      prev.map((s) => (s.id === sectionId ? { ...s, ...updates } : s))
+    )
+  }
+
+  const handleDeleteSection = (sectionId: string) => {
+    setSections((prev) => prev.filter((s) => s.id !== sectionId))
+  }
+
+  const handleAddField = (sectionId: string, type: FieldSchema['type']) => {
+    const baseField: Partial<FieldSchema> = { id: generateId(), label: 'New Field' }
+    switch (type) {
+      case 'text':      Object.assign(baseField, { type: 'text', placeholder: '', default: '' }); break
+      case 'textarea':  Object.assign(baseField, { type: 'textarea', placeholder: '', default: '', rows: 3 }); break
+      case 'toggle':    Object.assign(baseField, { type: 'toggle', description: '', default: false }); break
+      case 'slider':    Object.assign(baseField, { type: 'slider', min: 0, max: 10, step: 1, default: 5 }); break
+      case 'select':    Object.assign(baseField, { type: 'select', options: ['Option 1'], default: 'Option 1' }); break
+      case 'multi-select': Object.assign(baseField, { type: 'multi-select', options: ['Option 1'], default: [] }); break
+      case 'budget-split': Object.assign(baseField, { type: 'budget-split', entries: [] }); break
+    }
+    setSections((prev) =>
+      prev.map((s) =>
+        s.id === sectionId ? { ...s, fields: [...s.fields, baseField as FieldSchema] } : s
+      )
+    )
+  }
+
+  const handleUpdateField = (sectionId: string, fieldId: string, updates: Partial<FieldSchema>) => {
+    setSections((prev) =>
+      prev.map((s) =>
+        s.id === sectionId
+          ? { ...s, fields: s.fields.map((f) => (f.id === fieldId ? { ...f, ...updates } as FieldSchema : f)) }
+          : s
+      )
+    )
+  }
+
+  const handleDeleteField = (sectionId: string, fieldId: string) => {
+    setSections((prev) =>
+      prev.map((s) =>
+        s.id === sectionId ? { ...s, fields: s.fields.filter((f) => f.id !== fieldId) } : s
+      )
+    )
   }
 
   return (
@@ -568,10 +582,14 @@ export function TemplateBuilder({ templateId, onSave, onCancel }: TemplateBuilde
         ) : (
           <div className="space-y-2">
             {sections.map(section => (
-              <SectionEditor 
+              <SectionEditor
                 key={section.id}
-                templateId={templateId || 'new'}
                 section={section}
+                onUpdate={(updates) => handleUpdateSection(section.id, updates)}
+                onDelete={() => handleDeleteSection(section.id)}
+                onAddField={(type) => handleAddField(section.id, type)}
+                onUpdateField={(fieldId, updates) => handleUpdateField(section.id, fieldId, updates)}
+                onDeleteField={(fieldId) => handleDeleteField(section.id, fieldId)}
               />
             ))}
           </div>
