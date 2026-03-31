@@ -8,8 +8,10 @@ import { TemplateForm } from '@/components/builder/TemplateForm'
 import { TemplateBuilder } from '@/components/builder/TemplateBuilder'
 import { OutputPanel } from '@/components/output/OutputPanel'
 
-// Register templates once at module level
+// Force template registration at module load time
+console.log('About to register templates...')
 registerAllTemplates()
+console.log('Templates registered at module load')
 
 // Helper to get template (checks both core and custom)
 function getTemplate(id: string) {
