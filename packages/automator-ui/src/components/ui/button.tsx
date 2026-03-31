@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 const Button = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement> & {
-    variant?: 'default' | 'outline' | 'ghost' | 'secondary'
+    variant?: 'default' | 'outline' | 'ghost' | 'secondary' | 'destructive'
     size?: 'default' | 'sm' | 'lg' | 'icon'
   }
 >(({ className, variant = 'default', size = 'default', ...props }, ref) => (
@@ -16,6 +16,7 @@ const Button = React.forwardRef<
       variant === 'outline' && 'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
       variant === 'ghost' && 'hover:bg-accent hover:text-accent-foreground',
       variant === 'secondary' && 'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80',
+      variant === 'destructive' && 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
       size === 'default' && 'h-9 px-4 py-2',
       size === 'sm' && 'h-8 rounded-md px-3 text-xs',
       size === 'lg' && 'h-10 rounded-md px-8',

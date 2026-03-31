@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { useTemplateStore, getTemplateDefaultValues } from '@/store/templates'
-import type { Template, SectionSchema, FieldSchema, FieldValue, FieldValues } from '@automator/core'
-import { createTemplateRender } from '@automator/core'
+import { useTemplateStore } from '@/store/templates'
+import type { Template, SectionSchema, FieldSchema, FieldValues } from '@automator/core'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -14,10 +13,7 @@ import {
   ChevronRight,
   Save,
   X,
-  MoveUp,
-  MoveDown
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 type FieldTypeOption = {
   type: FieldSchema['type']
@@ -412,14 +408,13 @@ interface TemplateBuilderProps {
 }
 
 export function TemplateBuilder({ templateId, onSave, onCancel }: TemplateBuilderProps) {
-  const { templates, addTemplate, updateTemplate, deleteTemplate, addSection } = useTemplateStore()
+  const { templates, addTemplate, updateTemplate, deleteTemplate } = useTemplateStore()
   
   const existingTemplate = templateId ? templates.find(t => t.id === templateId) : null
   const [name, setName] = useState(existingTemplate?.name || 'New Template')
   const [description, setDescription] = useState(existingTemplate?.description || '')
   const [icon, setIcon] = useState(existingTemplate?.icon || '📝')
   const [sections, setSections] = useState<SectionSchema[]>(existingTemplate?.sections || [])
-  const [isEditing, setIsEditing] = useState(!!templateId)
 
   const handleSave = () => {
     const id = templateId || `custom-${generateId()}`
