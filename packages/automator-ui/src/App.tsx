@@ -27,9 +27,7 @@ export default function App() {
   const customTemplates = useTemplateStore((state) => state.templates)
 
   useEffect(() => {
-    console.log('App init, activeTemplateId:', activeTemplateId, 'customTemplates:', customTemplates.length)
     const templates = getAllTemplates()
-    console.log('All templates:', templates.map(t => t.id))
     if (!activeTemplateId && templates[0]) {
       setActiveTemplate(templates[0].id)
     }

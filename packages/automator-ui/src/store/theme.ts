@@ -36,7 +36,6 @@ function applyTheme(id: ThemeId) {
   document.documentElement.setAttribute('data-theme', id)
   // All themes are dark; keep .dark on root so Tailwind dark: utilities still work
   document.documentElement.classList.add('dark')
-  console.log('Theme applied:', id)
 }
 
 export const useThemeStore = create<ThemeStore>()(

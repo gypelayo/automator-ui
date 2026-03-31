@@ -4,7 +4,6 @@ import './index.css'
 import App from './App.tsx'
 import { initTheme } from './store/theme'
 
-console.log('main.tsx executing')
 initTheme()
 
 createRoot(document.getElementById('root')!).render(
