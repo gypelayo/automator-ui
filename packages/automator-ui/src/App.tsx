@@ -34,14 +34,12 @@ export default function App() {
     if (initialized.current) return
     initialized.current = true
     
-    setDebug(['getAllTemplates() called...', `activeTemplateId from state: ${activeTemplateId}`])
     const templates = getAllTemplates()
-    setDebug(d => [...d, `found ${templates.length} templates`])
+    const ids = templates.map(t => t.id)
+    setDebug(['templates found: ' + templates.length, 'ids: ' + ids.join(', '), 'activeTemplateId: ' + activeTemplateId])
+    
     if (!activeTemplateId && templates[0]) {
       setActiveTemplate(templates[0].id)
-      setDebug(d => [...d, `set active to ${templates[0].id}`])
-    } else if (activeTemplateId) {
-      setDebug(d => [...d, `keeping active ${activeTemplateId}`])
     }
   }, []) // No deps - run once on mount
 
