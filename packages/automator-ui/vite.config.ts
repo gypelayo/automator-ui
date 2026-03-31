@@ -5,7 +5,7 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/automator-ui/',
+  base: '/automator-ui/automator-ui/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

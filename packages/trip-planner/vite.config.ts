@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
 export default defineConfig({
-  base: '/trip-planner/',
+  base: '/automator-ui/trip-planner/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
