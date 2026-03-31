@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTemplateStore } from '@/store/templates'
 import type { Template, SectionSchema, FieldSchema, FieldValues } from '@automator/core'
 import { Input } from '@/components/ui/input'
@@ -415,6 +415,13 @@ export function TemplateBuilder({ templateId, onSave, onCancel }: TemplateBuilde
   const [description, setDescription] = useState(existingTemplate?.description || '')
   const [icon, setIcon] = useState(existingTemplate?.icon || '📝')
   const [sections, setSections] = useState<SectionSchema[]>(existingTemplate?.sections || [])
+
+  // Sync sections from store when editing existing template
+  useEffect(() => {
+    if (existingTemplate) {
+      setSections(existingTemplate.sections)
+    }
+  }, [existingTemplate?.sections])
 
   const handleSave = () => {
     const id = templateId || `custom-${generateId()}`
