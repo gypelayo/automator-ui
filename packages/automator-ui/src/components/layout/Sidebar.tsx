@@ -4,13 +4,13 @@ import { useConfigStore } from '@/store/config'
 import { useTemplateStore } from '@/store/templates'
 import { useThemeStore, THEMES } from '@/store/theme'
 import { cn } from '@/lib/utils'
-import { LayoutDashboard, ChevronLeft, ChevronRight, Palette, Plus, Pencil, Trash2 } from 'lucide-react'
+import { LayoutDashboard, ChevronLeft, ChevronRight, Palette, Plus, Pencil } from 'lucide-react'
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const [themeOpen, setThemeOpen] = useState(false)
   const coreTemplates = getCoreTemplates()
-  const customTemplates = useTemplateStore((state) => state.getAllTemplates())
+  const customTemplates = useTemplateStore.getState().getAllTemplates()
   const allTemplates = [...coreTemplates, ...customTemplates]
   const { activeTemplateId, setActiveTemplate, setEditMode } = useConfigStore()
   const { theme, setTheme } = useThemeStore()
