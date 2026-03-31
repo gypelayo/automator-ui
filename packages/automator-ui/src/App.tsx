@@ -9,9 +9,7 @@ import { TemplateBuilder } from '@/components/builder/TemplateBuilder'
 import { OutputPanel } from '@/components/output/OutputPanel'
 
 // Register templates once at module level
-console.log('registerAllTemplates called')
 registerAllTemplates()
-console.log('templates registered')
 
 // Helper to get template (checks both core and custom)
 function getTemplate(id: string) {
@@ -30,7 +28,6 @@ export default function App() {
 
   useEffect(() => {
     const templates = getAllTemplates()
-    console.log('Templates found:', templates.length, templates.map(t => t.id))
     if (!activeTemplateId && templates[0]) {
       setActiveTemplate(templates[0].id)
     }

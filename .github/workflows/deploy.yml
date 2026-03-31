@@ -42,10 +42,8 @@ jobs:
       - name: Assemble pages artifact
         run: |
           mkdir -p pages/automator-ui pages/trip-planner
-          cp -r packages/automator-ui/dist/* pages/automator-ui/ || true
-          ls -la pages/automator-ui/ || true
-          cp -r packages/trip-planner/dist/* pages/trip-planner/ || true
-          ls pages/
+          cp -r packages/automator-ui/dist/* pages/automator-ui/
+          cp -r packages/trip-planner/dist/* pages/trip-planner/
           # Root index redirects to automator-ui
           cat > pages/index.html <<'EOF'
           <!doctype html>
