@@ -1,5 +1,4 @@
 import type { SelectField } from '@automator/core'
-import { cn } from '@/lib/utils'
 
 interface SelectFieldProps {
   field: SelectField
@@ -12,16 +11,34 @@ export function SelectFieldComponent({ field, value, onChange }: SelectFieldProp
     <div className="space-y-1.5">
       <label className="text-sm font-medium text-foreground">{field.label}</label>
       {field.description && (
-        <p className="text-xs text-muted-foreground">{field.description}</p>
+        <p className="text-[11px] text-muted-foreground">{field.description}</p>
       )}
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={cn(
-          'flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm',
-          'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
-          'disabled:cursor-not-allowed disabled:opacity-50',
-        )}
+        style={{
+          display: 'flex',
+          width: '100%',
+          borderRadius: 'var(--radius)',
+          border: '1px solid hsl(var(--border))',
+          backgroundColor: 'hsl(var(--background-2))',
+          color: 'hsl(var(--foreground))',
+          padding: '0.4rem 0.625rem',
+          fontSize: '0.8125rem',
+          lineHeight: '1.5',
+          outline: 'none',
+          cursor: 'pointer',
+          fontFamily: 'inherit',
+          appearance: 'auto',
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = 'hsl(var(--ring))'
+          e.currentTarget.style.boxShadow = '0 0 0 2px hsl(var(--ring) / 0.2)'
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = 'hsl(var(--border))'
+          e.currentTarget.style.boxShadow = 'none'
+        }}
       >
         {field.options.map((opt) => (
           <option key={opt} value={opt}>

@@ -7,7 +7,7 @@ import { TextInputFieldComponent, TextAreaFieldComponent } from '@/components/fi
 import { MultiSelectFieldComponent } from '@/components/fields/MultiSelectField'
 import { SelectFieldComponent } from '@/components/fields/SelectField'
 import { BudgetSplitFieldComponent } from '@/components/fields/BudgetSplitField'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface SectionGroupProps {
@@ -25,77 +25,110 @@ function SectionGroup({ section, templateId, values }: SectionGroupProps) {
   }
 
   return (
-    <div className="border border-border rounded-lg overflow-hidden">
+    <div
+      className="rounded-lg overflow-hidden border"
+      style={{
+        borderColor: 'hsl(var(--border))',
+        backgroundColor: 'hsl(var(--card))',
+      }}
+    >
+      {/* Section header */}
       <button
-        className="w-full flex items-center justify-between px-4 py-3 bg-muted/40 hover:bg-muted/70 transition-colors text-left"
+        className="w-full flex items-center justify-between px-4 py-3 text-left transition-colors hover:bg-accent/40 group"
         onClick={() => setOpen((o) => !o)}
       >
-        <div>
-          <p className="text-sm font-semibold text-foreground">{section.title}</p>
-          {section.description && (
-            <p className="text-xs text-muted-foreground mt-0.5">{section.description}</p>
-          )}
+        <div className="flex items-center gap-3 min-w-0">
+          {/* Accent bar */}
+          <span
+            className="w-1 h-5 rounded-full shrink-0"
+            style={{
+              backgroundColor: open ? 'hsl(var(--primary))' : 'hsl(var(--border))',
+              transition: 'background-color 0.15s',
+            }}
+          />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-foreground tracking-tight">
+              {section.title}
+            </p>
+            {section.description && (
+              <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                {section.description}
+              </p>
+            )}
+          </div>
         </div>
-        {open
-          ? <ChevronDown size={16} className="text-muted-foreground shrink-0" />
-          : <ChevronRight size={16} className="text-muted-foreground shrink-0" />}
+        <span className="text-muted-foreground shrink-0 ml-2 transition-transform duration-150" style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)' }}>
+          <ChevronDown size={15} />
+        </span>
       </button>
 
+      {/* Fields */}
       {open && (
-        <div className="px-4 py-4 space-y-5 divide-y divide-border/60">
-          {section.fields.map((field, i) => (
-            <div key={field.id} className={cn(i > 0 && 'pt-5')}>
-              {field.type === 'slider' && (
-                <SliderFieldComponent
-                  field={field}
-                  value={(values[field.id] as number) ?? field.default}
-                  onChange={(v) => setValue(field.id, v)}
-                />
-              )}
-              {field.type === 'toggle' && (
-                <ToggleFieldComponent
-                  field={field}
-                  value={(values[field.id] as boolean) ?? field.default}
-                  onChange={(v) => setValue(field.id, v)}
-                />
-              )}
-              {field.type === 'text' && (
-                <TextInputFieldComponent
-                  field={field}
-                  value={(values[field.id] as string) ?? field.default}
-                  onChange={(v) => setValue(field.id, v)}
-                />
-              )}
-              {field.type === 'textarea' && (
-                <TextAreaFieldComponent
-                  field={field}
-                  value={(values[field.id] as string) ?? field.default}
-                  onChange={(v) => setValue(field.id, v)}
-                />
-              )}
-              {field.type === 'multi-select' && (
-                <MultiSelectFieldComponent
-                  field={field}
-                  value={(values[field.id] as string[]) ?? field.default}
-                  onChange={(v) => setValue(field.id, v)}
-                />
-              )}
-              {field.type === 'select' && (
-                <SelectFieldComponent
-                  field={field}
-                  value={(values[field.id] as string) ?? field.default}
-                  onChange={(v) => setValue(field.id, v)}
-                />
-              )}
-              {field.type === 'budget-split' && (
-                <BudgetSplitFieldComponent
-                  field={field}
-                  value={(values[field.id] as BudgetEntry[]) ?? []}
-                  onChange={(v) => setValue(field.id, v)}
-                />
-              )}
-            </div>
-          ))}
+        <div
+          className="border-t"
+          style={{ borderColor: 'hsl(var(--border))' }}
+        >
+          <div className="px-5 py-4 space-y-5">
+            {section.fields.map((field, i) => (
+              <div
+                key={field.id}
+                className={cn(
+                  i > 0 && 'pt-5 border-t',
+                )}
+                style={i > 0 ? { borderColor: 'hsl(var(--border) / 0.5)' } : {}}
+              >
+                {field.type === 'slider' && (
+                  <SliderFieldComponent
+                    field={field}
+                    value={(values[field.id] as number) ?? field.default}
+                    onChange={(v) => setValue(field.id, v)}
+                  />
+                )}
+                {field.type === 'toggle' && (
+                  <ToggleFieldComponent
+                    field={field}
+                    value={(values[field.id] as boolean) ?? field.default}
+                    onChange={(v) => setValue(field.id, v)}
+                  />
+                )}
+                {field.type === 'text' && (
+                  <TextInputFieldComponent
+                    field={field}
+                    value={(values[field.id] as string) ?? field.default}
+                    onChange={(v) => setValue(field.id, v)}
+                  />
+                )}
+                {field.type === 'textarea' && (
+                  <TextAreaFieldComponent
+                    field={field}
+                    value={(values[field.id] as string) ?? field.default}
+                    onChange={(v) => setValue(field.id, v)}
+                  />
+                )}
+                {field.type === 'multi-select' && (
+                  <MultiSelectFieldComponent
+                    field={field}
+                    value={(values[field.id] as string[]) ?? field.default}
+                    onChange={(v) => setValue(field.id, v)}
+                  />
+                )}
+                {field.type === 'select' && (
+                  <SelectFieldComponent
+                    field={field}
+                    value={(values[field.id] as string) ?? field.default}
+                    onChange={(v) => setValue(field.id, v)}
+                  />
+                )}
+                {field.type === 'budget-split' && (
+                  <BudgetSplitFieldComponent
+                    field={field}
+                    value={(values[field.id] as BudgetEntry[]) ?? []}
+                    onChange={(v) => setValue(field.id, v)}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -112,7 +145,7 @@ export function TemplateForm({ sections, templateId }: TemplateFormProps) {
   const values = (templateValues[templateId] ?? {}) as Record<string, FieldValue>
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {sections.map((sec) => (
         <SectionGroup
           key={sec.id}

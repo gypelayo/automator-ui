@@ -25,32 +25,47 @@ export default function App() {
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
 
-      <main className="flex-1 overflow-y-auto px-6 py-6 min-w-0">
+      <main className="flex-1 min-w-0 flex flex-col">
         {template ? (
           <>
-            {/* Template header + export actions */}
-            <div className="mb-6 flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3">
+            {/* Sticky top bar */}
+            <header
+              className="sticky top-0 z-10 flex items-center justify-between gap-4 px-6 h-14 border-b shrink-0"
+              style={{
+                backgroundColor: 'hsl(var(--background))',
+                borderColor: 'hsl(var(--border))',
+              }}
+            >
+              <div className="flex items-center gap-3 min-w-0">
                 {template.icon && (
-                  <span className="text-2xl leading-none">{template.icon}</span>
+                  <span className="text-xl leading-none shrink-0">{template.icon}</span>
                 )}
-                <div>
-                  <h1 className="text-xl font-semibold text-foreground">{template.name}</h1>
-                  <p className="text-sm text-muted-foreground mt-0.5">{template.description}</p>
+                <div className="min-w-0">
+                  <h1 className="text-sm font-semibold text-foreground leading-tight truncate">
+                    {template.name}
+                  </h1>
+                  <p className="text-[11px] text-muted-foreground truncate">
+                    {template.description}
+                  </p>
                 </div>
               </div>
+
+              {/* Output actions inline in header */}
               <div className="shrink-0">
                 <OutputPanel />
               </div>
-            </div>
+            </header>
 
-            <TemplateForm
-              sections={template.sections}
-              templateId={template.id}
-            />
+            {/* Scrollable form body */}
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <TemplateForm
+                sections={template.sections}
+                templateId={template.id}
+              />
+            </div>
           </>
         ) : (
-          <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+          <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
             Select a template from the sidebar to get started
           </div>
         )}

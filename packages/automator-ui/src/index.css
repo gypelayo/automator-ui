@@ -1,60 +1,297 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* ============================================================
+   BASE TOKEN MAPPING  (all themes use these var names)
+   ============================================================ */
 @layer base {
+
+  /* ----------------------------------------------------------
+     DEFAULT LIGHT
+     ---------------------------------------------------------- */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 262.1 83.3% 57.8%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 262.1 83.3% 57.8%;
-    --radius: 0.5rem;
+    --background:        0 0% 98%;
+    --background-2:      0 0% 94%;
+    --foreground:        220 13% 18%;
+    --card:              0 0% 100%;
+    --card-foreground:   220 13% 18%;
+    --popover:           0 0% 100%;
+    --popover-foreground:220 13% 18%;
+    --primary:           262 83% 58%;
+    --primary-foreground:0 0% 100%;
+    --secondary:         220 14% 93%;
+    --secondary-foreground:220 14% 25%;
+    --muted:             220 14% 93%;
+    --muted-foreground:  220 9% 46%;
+    --accent:            220 14% 90%;
+    --accent-foreground: 220 14% 20%;
+    --destructive:       0 84% 60%;
+    --destructive-foreground:0 0% 100%;
+    --border:            220 13% 88%;
+    --input:             220 13% 88%;
+    --ring:              262 83% 58%;
+    --radius:            0.45rem;
+    --sidebar-bg:        220 16% 96%;
+    --sidebar-border:    220 13% 88%;
   }
 
-  .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 263.4 70% 50.4%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 263.4 70% 50.4%;
+  /* ----------------------------------------------------------
+     DEFAULT DARK  (theme="default")
+     ---------------------------------------------------------- */
+  .dark,
+  [data-theme="default"] {
+    --background:        224 20% 10%;
+    --background-2:      224 20% 13%;
+    --foreground:        210 18% 88%;
+    --card:              224 20% 13%;
+    --card-foreground:   210 18% 88%;
+    --popover:           224 20% 13%;
+    --popover-foreground:210 18% 88%;
+    --primary:           262 70% 62%;
+    --primary-foreground:0 0% 100%;
+    --secondary:         215 20% 18%;
+    --secondary-foreground:210 18% 88%;
+    --muted:             215 20% 18%;
+    --muted-foreground:  217 11% 56%;
+    --accent:            215 20% 20%;
+    --accent-foreground: 210 18% 88%;
+    --destructive:       0 63% 48%;
+    --destructive-foreground:0 0% 100%;
+    --border:            215 20% 20%;
+    --input:             215 20% 20%;
+    --ring:              262 70% 62%;
+    --sidebar-bg:        224 20% 8%;
+    --sidebar-border:    215 20% 16%;
+  }
+
+  /* ----------------------------------------------------------
+     GRUVBOX DARK  (earthy yellows, oranges, dark bg)
+     ---------------------------------------------------------- */
+  [data-theme="gruvbox"] {
+    --background:        28 14% 13%;   /* #282828 */
+    --background-2:      28 14% 17%;   /* #3c3836 */
+    --foreground:        43 59% 81%;   /* #ebdbb2 */
+    --card:              28 14% 17%;
+    --card-foreground:   43 59% 81%;
+    --popover:           28 14% 17%;
+    --popover-foreground:43 59% 81%;
+    --primary:           40 73% 56%;   /* #d79921 yellow */
+    --primary-foreground:28 14% 13%;
+    --secondary:         28 14% 21%;   /* #504945 */
+    --secondary-foreground:43 59% 81%;
+    --muted:             28 14% 21%;
+    --muted-foreground:  40 18% 55%;   /* #a89984 */
+    --accent:            28 14% 24%;
+    --accent-foreground: 43 59% 81%;
+    --destructive:       0 72% 50%;    /* #cc241d */
+    --destructive-foreground:43 59% 81%;
+    --border:            28 14% 22%;
+    --input:             28 14% 22%;
+    --ring:              40 73% 56%;
+    --sidebar-bg:        28 14% 10%;
+    --sidebar-border:    28 14% 20%;
+    --radius:            0.3rem;
+  }
+
+  /* ----------------------------------------------------------
+     NORD  (arctic blues)
+     ---------------------------------------------------------- */
+  [data-theme="nord"] {
+    --background:        220 17% 14%;  /* #2e3440 */
+    --background-2:      220 16% 18%;  /* #3b4252 */
+    --foreground:        218 27% 88%;  /* #d8dee9 */
+    --card:              220 16% 18%;
+    --card-foreground:   218 27% 88%;
+    --popover:           220 16% 18%;
+    --popover-foreground:218 27% 88%;
+    --primary:           193 43% 67%;  /* #88c0d0 frost */
+    --primary-foreground:220 17% 14%;
+    --secondary:         220 15% 22%;  /* #434c5e */
+    --secondary-foreground:218 27% 88%;
+    --muted:             220 15% 22%;
+    --muted-foreground:  220 10% 58%;  /* #7b88a0 */
+    --accent:            220 15% 26%;  /* #4c566a */
+    --accent-foreground: 218 27% 88%;
+    --destructive:       354 42% 56%;  /* #bf616a */
+    --destructive-foreground:218 27% 88%;
+    --border:            220 15% 24%;
+    --input:             220 15% 24%;
+    --ring:              193 43% 67%;
+    --sidebar-bg:        220 17% 11%;
+    --sidebar-border:    220 15% 20%;
+    --radius:            0.4rem;
+  }
+
+  /* ----------------------------------------------------------
+     DRACULA  (purple-pink neon)
+     ---------------------------------------------------------- */
+  [data-theme="dracula"] {
+    --background:        231 15% 18%;  /* #282a36 */
+    --background-2:      232 14% 22%;  /* #343746 */
+    --foreground:        60 30% 96%;   /* #f8f8f2 */
+    --card:              232 14% 22%;
+    --card-foreground:   60 30% 96%;
+    --popover:           232 14% 22%;
+    --popover-foreground:60 30% 96%;
+    --primary:           265 89% 78%;  /* #bd93f9 purple */
+    --primary-foreground:231 15% 18%;
+    --secondary:         232 14% 27%;  /* #44475a */
+    --secondary-foreground:60 30% 96%;
+    --muted:             232 14% 27%;
+    --muted-foreground:  240 7% 62%;   /* #6272a4 comment */
+    --accent:            232 14% 30%;
+    --accent-foreground: 60 30% 96%;
+    --destructive:       0 100% 67%;   /* #ff5555 */
+    --destructive-foreground:60 30% 96%;
+    --border:            232 14% 28%;
+    --input:             232 14% 28%;
+    --ring:              265 89% 78%;
+    --sidebar-bg:        231 15% 14%;
+    --sidebar-border:    232 14% 24%;
+    --radius:            0.5rem;
+  }
+
+  /* ----------------------------------------------------------
+     TOKYO NIGHT  (deep blue-purple city vibes)
+     ---------------------------------------------------------- */
+  [data-theme="tokyo"] {
+    --background:        235 22% 13%;  /* #1a1b26 */
+    --background-2:      234 20% 17%;  /* #24283b */
+    --foreground:        228 27% 82%;  /* #c0caf5 */
+    --card:              234 20% 17%;
+    --card-foreground:   228 27% 82%;
+    --popover:           234 20% 17%;
+    --popover-foreground:228 27% 82%;
+    --primary:           267 84% 81%;  /* #bb9af7 */
+    --primary-foreground:235 22% 13%;
+    --secondary:         234 18% 21%;  /* #292e42 */
+    --secondary-foreground:228 27% 82%;
+    --muted:             234 18% 21%;
+    --muted-foreground:  228 15% 55%;  /* #565f89 */
+    --accent:            234 18% 24%;
+    --accent-foreground: 228 27% 82%;
+    --destructive:       0 76% 63%;    /* #f7768e */
+    --destructive-foreground:228 27% 82%;
+    --border:            234 18% 22%;
+    --input:             234 18% 22%;
+    --ring:              267 84% 81%;
+    --sidebar-bg:        235 22% 10%;
+    --sidebar-border:    234 18% 18%;
+    --radius:            0.5rem;
+  }
+
+  /* ----------------------------------------------------------
+     CATPPUCCIN MOCHA  (soft pastel-dark)
+     ---------------------------------------------------------- */
+  [data-theme="catppuccin"] {
+    --background:        240 21% 15%;  /* #1e1e2e */
+    --background-2:      240 21% 19%;  /* #313244 */
+    --foreground:        226 64% 88%;  /* #cdd6f4 */
+    --card:              240 21% 19%;
+    --card-foreground:   226 64% 88%;
+    --popover:           240 21% 19%;
+    --popover-foreground:226 64% 88%;
+    --primary:           267 83% 80%;  /* #cba6f7 mauve */
+    --primary-foreground:240 21% 15%;
+    --secondary:         240 19% 23%;  /* #45475a */
+    --secondary-foreground:226 64% 88%;
+    --muted:             240 19% 23%;
+    --muted-foreground:  240 12% 58%;  /* #9399b2 overlay */
+    --accent:            240 19% 26%;
+    --accent-foreground: 226 64% 88%;
+    --destructive:       343 81% 75%;  /* #f38ba8 */
+    --destructive-foreground:240 21% 15%;
+    --border:            240 19% 24%;
+    --input:             240 19% 24%;
+    --ring:              267 83% 80%;
+    --sidebar-bg:        240 21% 11%;
+    --sidebar-border:    240 19% 19%;
+    --radius:            0.6rem;
+  }
+
+  /* ----------------------------------------------------------
+     SOLARIZED DARK  (classic retro)
+     ---------------------------------------------------------- */
+  [data-theme="solarized"] {
+    --background:        192 100% 11%; /* #002b36 base03 */
+    --background-2:      192 81% 14%;  /* #073642 base02 */
+    --foreground:        186 14% 64%;  /* #839496 base0 */
+    --card:              192 81% 14%;
+    --card-foreground:   186 14% 64%;
+    --popover:           192 81% 14%;
+    --popover-foreground:186 14% 64%;
+    --primary:           175 59% 40%;  /* #2aa198 cyan */
+    --primary-foreground:192 100% 11%;
+    --secondary:         192 71% 17%;
+    --secondary-foreground:186 14% 64%;
+    --muted:             192 71% 17%;
+    --muted-foreground:  194 14% 40%;  /* #586e75 base01 */
+    --accent:            192 71% 20%;
+    --accent-foreground: 186 14% 64%;
+    --destructive:       1 71% 52%;    /* #dc322f red */
+    --destructive-foreground:192 100% 11%;
+    --border:            192 71% 18%;
+    --input:             192 71% 18%;
+    --ring:              175 59% 40%;
+    --sidebar-bg:        192 100% 8%;
+    --sidebar-border:    192 71% 15%;
+    --radius:            0.3rem;
   }
 }
 
+/* ============================================================
+   GLOBAL BASE STYLES
+   ============================================================ */
 @layer base {
   * {
     border-color: hsl(var(--border));
   }
+
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
   }
+
+  /* Subtle scanline / noise texture on body for unix-terminal feel */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      hsl(0 0% 0% / 0.03) 2px,
+      hsl(0 0% 0% / 0.03) 4px
+    );
+  }
+}
+
+/* ============================================================
+   CUSTOM SCROLLBAR  (thin, themed)
+   ============================================================ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* ============================================================
+   FONTS
+   ============================================================ */
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+code, .font-mono, .mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
