@@ -24,13 +24,16 @@ function getAllTemplates() {
 
 export default function App() {
   const { activeTemplateId, setActiveTemplate, isEditMode, editingTemplateId, setEditMode } = useConfigStore()
+  const customTemplates = useTemplateStore((state) => state.templates)
 
   useEffect(() => {
-    if (!activeTemplateId) {
-      const templates = getAllTemplates()
-      if (templates[0]) setActiveTemplate(templates[0].id)
+    console.log('App init, activeTemplateId:', activeTemplateId, 'customTemplates:', customTemplates.length)
+    const templates = getAllTemplates()
+    console.log('All templates:', templates.map(t => t.id))
+    if (!activeTemplateId && templates[0]) {
+      setActiveTemplate(templates[0].id)
     }
-  }, [activeTemplateId, setActiveTemplate])
+  }, [activeTemplateId, customTemplates])
 
   const handleEditSave = () => {
     setEditMode(false)
@@ -123,4 +126,3 @@ export default function App() {
     </div>
   )
 }
-// test
