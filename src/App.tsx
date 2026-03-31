@@ -12,7 +12,6 @@ registerAllTemplates()
 export default function App() {
   const { activeTemplateId, setActiveTemplate } = useConfigStore()
 
-  // Pick the first template if nothing is active after rehydration
   useEffect(() => {
     if (!activeTemplateId) {
       const templates = getAllTemplates()
@@ -26,48 +25,36 @@ export default function App() {
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
 
-      <div className="flex flex-1 overflow-hidden min-h-screen">
-        {/* Config form */}
-        <main className="flex-1 overflow-y-auto px-6 py-6 min-w-0">
-          {template ? (
-            <>
-              <div className="mb-6">
-                <div className="flex items-center gap-3">
-                  {template.icon && (
-                    <span className="text-2xl leading-none">{template.icon}</span>
-                  )}
-                  <div>
-                    <h1 className="text-xl font-semibold text-foreground">{template.name}</h1>
-                    <p className="text-sm text-muted-foreground mt-0.5">{template.description}</p>
-                  </div>
+      <main className="flex-1 overflow-y-auto px-6 py-6 min-w-0">
+        {template ? (
+          <>
+            {/* Template header + export actions */}
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div className="flex items-center gap-3">
+                {template.icon && (
+                  <span className="text-2xl leading-none">{template.icon}</span>
+                )}
+                <div>
+                  <h1 className="text-xl font-semibold text-foreground">{template.name}</h1>
+                  <p className="text-sm text-muted-foreground mt-0.5">{template.description}</p>
                 </div>
               </div>
-
-              <TemplateForm
-                sections={template.sections}
-                templateId={template.id}
-              />
-            </>
-          ) : (
-            <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
-              Select a template from the sidebar to get started
+              <div className="shrink-0">
+                <OutputPanel />
+              </div>
             </div>
-          )}
-        </main>
 
-        {/* Output panel */}
-        <aside className="w-[420px] shrink-0 border-l border-border flex flex-col h-screen sticky top-0 overflow-hidden">
-          <div className="px-4 py-4 border-b border-border">
-            <p className="text-sm font-semibold text-foreground">Output</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Live-compiled markdown context file
-            </p>
+            <TemplateForm
+              sections={template.sections}
+              templateId={template.id}
+            />
+          </>
+        ) : (
+          <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+            Select a template from the sidebar to get started
           </div>
-          <div className="flex-1 overflow-hidden flex flex-col">
-            <OutputPanel />
-          </div>
-        </aside>
-      </div>
+        )}
+      </main>
     </div>
   )
 }
