@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { registerAllTemplates } from '@/templates'
 import { getAllTemplates as getCoreTemplates, getTemplate as getCoreTemplate } from '@automator/core'
 import { useConfigStore } from '@/store/config'
@@ -24,17 +24,24 @@ function getAllTemplates() {
 
 export default function App() {
   const [debug, setDebug] = useState<string[]>([])
+  const initialized = useRef(false)
   const { activeTemplateId, setActiveTemplate, isEditMode, editingTemplateId, setEditMode } = useConfigStore()
   const customTemplates = useTemplateStore((state) => state.templates)
 
   useEffect(() => {
-    setDebug(['getAllTemplates() called...'])
+    if (initialized.current) return
+    initialized.current = true
+    
+    setDebug(['getAllTemplates() called...', `activeTemplateId from state: ${activeTemplateId}`])
     const templates = getAllTemplates()
     setDebug(d => [...d, `found ${templates.length} templates`])
     if (!activeTemplateId && templates[0]) {
       setActiveTemplate(templates[0].id)
+      setDebug(d => [...d, `set active to ${templates[0].id}`])
+    } else if (activeTemplateId) {
+      setDebug(d => [...d, `keeping active ${activeTemplateId}`])
     }
-  }, [activeTemplateId, customTemplates])
+  }, []) // No deps - run once on mount
 
   if (debug.length > 0) {
     return (
