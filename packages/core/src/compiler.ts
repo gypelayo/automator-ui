@@ -1,4 +1,4 @@
-import type { FieldSchema, FieldValues, FieldValue, BudgetEntry } from './types'
+import type { FieldSchema, FieldValues, FieldValue, BudgetEntry, Template } from './types'
 
 /** Returns the default values for a list of field schemas */
 export function getDefaultValues(fields: FieldSchema[]): FieldValues {
@@ -99,4 +99,22 @@ export function compileFields(
   }
 
   return lines.join('\n')
+}
+
+/** Creates a default render function for custom templates */
+export function createTemplateRender(template: Template): (values: FieldValues) => string {
+  return (values: FieldValues): string => {
+    const lines: string[] = []
+    lines.push(`# ${template.name}\n`)
+    lines.push(template.description ? `${template.description}\n` : '\n')
+
+    for (const section of template.sections) {
+      const sectionContent = compileFields(section.fields, values)
+      if (sectionContent.trim()) {
+        lines.push(section(section.title, sectionContent))
+      }
+    }
+
+    return lines.join('\n')
+  }
 }

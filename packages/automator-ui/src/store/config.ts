@@ -1,12 +1,17 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { FieldValues, FieldValue } from '@automator/core'
-import { getTemplate, getAllTemplates } from '@automator/core'
+import { getTemplate as getCoreTemplate, getAllTemplates as getCoreTemplates } from '@automator/core'
 import { getDefaultValues } from '@automator/core'
+import { useTemplateStore } from './templates'
 
 interface ConfigStore {
   // Active template
   activeTemplateId: string | null
+  
+  // Edit mode
+  isEditMode: boolean
+  editingTemplateId: string | null
 
   // Per-template values keyed by templateId
   templateValues: Record<string, FieldValues>
@@ -15,16 +20,30 @@ interface ConfigStore {
   setActiveTemplate: (templateId: string) => void
   setFieldValue: (templateId: string, fieldId: string, value: FieldValue) => void
   resetTemplate: (templateId: string) => void
+  setEditMode: (isEditing: boolean, templateId?: string | null) => void
 
   // Derived
   getActiveValues: () => FieldValues
   getCompiledMarkdown: () => string
 }
 
+// Helper to get template (checks both core and custom)
+function getTemplate(id: string): ReturnType<typeof getCoreTemplate> {
+  const customTemplates = useTemplateStore.getState().getAllTemplates()
+  return getCoreTemplate(id, customTemplates) ?? undefined
+}
+
+function getAllTemplates(): ReturnType<typeof getCoreTemplates> {
+  const customTemplates = useTemplateStore.getState().getAllTemplates()
+  return getCoreTemplates(customTemplates)
+}
+
 export const useConfigStore = create<ConfigStore>()(
   persist(
     (set, get) => ({
       activeTemplateId: null,
+      isEditMode: false,
+      editingTemplateId: null,
       templateValues: {},
 
       setActiveTemplate: (templateId: string) => {
@@ -74,6 +93,10 @@ export const useConfigStore = create<ConfigStore>()(
         set((state) => ({
           templateValues: { ...state.templateValues, [templateId]: defaults },
         }))
+      },
+
+      setEditMode: (isEditing: boolean, templateId: string | null = null) => {
+        set({ isEditMode: isEditing, editingTemplateId: templateId })
       },
 
       getActiveValues: () => {

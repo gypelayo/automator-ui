@@ -1,16 +1,29 @@
 import { useEffect } from 'react'
 import { registerAllTemplates } from '@/templates'
-import { getAllTemplates, getTemplate } from '@automator/core'
+import { getAllTemplates as getCoreTemplates, getTemplate as getCoreTemplate } from '@automator/core'
 import { useConfigStore } from '@/store/config'
+import { useTemplateStore } from '@/store/templates'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TemplateForm } from '@/components/builder/TemplateForm'
+import { TemplateBuilder } from '@/components/builder/TemplateBuilder'
 import { OutputPanel } from '@/components/output/OutputPanel'
 
 // Register templates once at module level
 registerAllTemplates()
 
+// Helper to get template (checks both core and custom)
+function getTemplate(id: string) {
+  const customTemplates = useTemplateStore.getState().getAllTemplates()
+  return getCoreTemplate(id, customTemplates)
+}
+
+function getAllTemplates() {
+  const customTemplates = useTemplateStore.getState().getAllTemplates()
+  return getCoreTemplates(customTemplates)
+}
+
 export default function App() {
-  const { activeTemplateId, setActiveTemplate } = useConfigStore()
+  const { activeTemplateId, setActiveTemplate, isEditMode, editingTemplateId, setEditMode } = useConfigStore()
 
   useEffect(() => {
     if (!activeTemplateId) {
@@ -18,6 +31,43 @@ export default function App() {
       if (templates[0]) setActiveTemplate(templates[0].id)
     }
   }, [activeTemplateId, setActiveTemplate])
+
+  const handleEditSave = () => {
+    setEditMode(false)
+    // Switch to the template we just created/edited
+    const templates = getAllTemplates()
+    if (templates.length > 0) {
+      setActiveTemplate(templates[templates.length - 1].id)
+    }
+  }
+
+  const handleEditCancel = () => {
+    setEditMode(false)
+    // If we were editing an existing template, go back to it
+    if (editingTemplateId) {
+      setActiveTemplate(editingTemplateId)
+    } else if (activeTemplateId) {
+      // Stay on current template if creating new was cancelled
+    } else {
+      const templates = getAllTemplates()
+      if (templates[0]) setActiveTemplate(templates[0].id)
+    }
+  }
+
+  if (isEditMode) {
+    return (
+      <div className="flex min-h-screen bg-background text-foreground">
+        <Sidebar />
+        <main className="flex-1 overflow-y-auto px-6 py-6">
+          <TemplateBuilder
+            templateId={editingTemplateId || undefined}
+            onSave={handleEditSave}
+            onCancel={handleEditCancel}
+          />
+        </main>
+      </div>
+    )
+  }
 
   const template = activeTemplateId ? getTemplate(activeTemplateId) : null
 

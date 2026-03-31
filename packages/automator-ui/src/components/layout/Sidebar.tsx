@@ -1,15 +1,18 @@
 import { useState } from 'react'
-import { getAllTemplates } from '@automator/core'
+import { getAllTemplates as getCoreTemplates } from '@automator/core'
 import { useConfigStore } from '@/store/config'
+import { useTemplateStore } from '@/store/templates'
 import { useThemeStore, THEMES } from '@/store/theme'
 import { cn } from '@/lib/utils'
-import { LayoutDashboard, ChevronLeft, ChevronRight, Palette } from 'lucide-react'
+import { LayoutDashboard, ChevronLeft, ChevronRight, Palette, Plus, Pencil, Trash2 } from 'lucide-react'
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const [themeOpen, setThemeOpen] = useState(false)
-  const templates = getAllTemplates()
-  const { activeTemplateId, setActiveTemplate } = useConfigStore()
+  const coreTemplates = getCoreTemplates()
+  const customTemplates = useTemplateStore((state) => state.getAllTemplates())
+  const allTemplates = [...coreTemplates, ...customTemplates]
+  const { activeTemplateId, setActiveTemplate, setEditMode } = useConfigStore()
   const { theme, setTheme } = useThemeStore()
 
   const activeTheme = THEMES.find((t) => t.id === theme) ?? THEMES[0]
@@ -61,33 +64,56 @@ export function Sidebar() {
             Templates
           </p>
         )}
-        {templates.map((t) => {
+        {allTemplates.map((t) => {
           const active = activeTemplateId === t.id
+          const isCustom = t.id.startsWith('custom-')
           return (
-            <button
-              key={t.id}
-              onClick={() => setActiveTemplate(t.id)}
-              title={collapsed ? t.name : undefined}
-              className={cn(
-                'w-full flex items-center rounded text-left transition-all duration-150',
-                collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-3 py-2.5',
-                active
-                  ? 'bg-primary/15 text-primary border-l-2 border-primary'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground border-l-2 border-transparent',
+            <div key={t.id} className="group relative">
+              <button
+                onClick={() => setActiveTemplate(t.id)}
+                title={collapsed ? t.name : undefined}
+                className={cn(
+                  'w-full flex items-center rounded text-left transition-all duration-150',
+                  collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-3 py-2.5',
+                  active
+                    ? 'bg-primary/15 text-primary border-l-2 border-primary'
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground border-l-2 border-transparent',
+                )}
+              >
+                {t.icon && (
+                  <span className="text-base leading-none shrink-0">{t.icon}</span>
+                )}
+                {!collapsed && (
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium truncate">{t.name}</p>
+                    <p className="text-[11px] truncate opacity-60 mt-0.5">{t.description}</p>
+                  </div>
+                )}
+              </button>
+              {/* Edit button for custom templates */}
+              {isCustom && !collapsed && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setEditMode(true, t.id) }}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-accent text-muted-foreground hover:text-foreground transition-all"
+                  title="Edit template"
+                >
+                  <Pencil size={12} />
+                </button>
               )}
-            >
-              {t.icon && (
-                <span className="text-base leading-none shrink-0">{t.icon}</span>
-              )}
-              {!collapsed && (
-                <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">{t.name}</p>
-                  <p className="text-[11px] truncate opacity-60 mt-0.5">{t.description}</p>
-                </div>
-              )}
-            </button>
+            </div>
           )
         })}
+        
+        {/* Create new template button */}
+        {!collapsed && (
+          <button
+            onClick={() => setEditMode(true, null)}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded text-left text-muted-foreground hover:bg-accent hover:text-foreground border border-dashed border-muted-foreground/30 transition-colors"
+          >
+            <Plus size={14} />
+            <span className="text-sm font-medium">Create Template</span>
+          </button>
+        )}
       </nav>
 
       {/* Footer: theme picker */}
