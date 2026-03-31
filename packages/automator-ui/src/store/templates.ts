@@ -132,7 +132,7 @@ export const useTemplateStore = create<TemplateStore>()(
                       ? {
                           ...s,
                           fields: s.fields.map((f) =>
-                            f.id === fieldId ? { ...f, ...updates } : f
+                            f.id === fieldId ? { ...f, ...updates } as FieldSchema : f
                           ),
                         }
                       : s

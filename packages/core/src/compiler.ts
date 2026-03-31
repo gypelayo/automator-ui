@@ -108,10 +108,10 @@ export function createTemplateRender(template: Template): (values: FieldValues) 
     lines.push(`# ${template.name}\n`)
     lines.push(template.description ? `${template.description}\n` : '\n')
 
-    for (const section of template.sections) {
-      const sectionContent = compileFields(section.fields, values)
+    for (const sect of template.sections) {
+      const sectionContent = compileFields(sect.fields, values)
       if (sectionContent.trim()) {
-        lines.push(section(section.title, sectionContent))
+        lines.push(section(sect.title, sectionContent))
       }
     }
 
