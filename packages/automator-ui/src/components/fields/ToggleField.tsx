@@ -9,11 +9,11 @@ interface ToggleFieldProps {
 
 export function ToggleFieldComponent({ field, value, onChange }: ToggleFieldProps) {
   return (
-    <div
-      className="flex items-center justify-between gap-4 cursor-pointer select-none"
-      onClick={() => onChange(!value)}
-    >
-      <div className="flex-1 min-w-0">
+    <div className="flex items-center justify-between gap-4">
+      <div
+        className="flex-1 min-w-0 cursor-pointer select-none"
+        onClick={() => onChange(!value)}
+      >
         <label className="text-sm font-medium text-foreground cursor-pointer leading-snug">
           {field.label}
         </label>
@@ -26,7 +26,6 @@ export function ToggleFieldComponent({ field, value, onChange }: ToggleFieldProp
       <Switch
         checked={value}
         onCheckedChange={onChange}
-        onClick={(e) => e.stopPropagation()}
       />
     </div>
   )

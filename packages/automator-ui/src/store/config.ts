@@ -32,20 +32,20 @@ export const useConfigStore = create<ConfigStore>()(
         if (!template) return
 
         set((state) => {
-          // Initialise defaults if this template has never been configured
-          const existing = state.templateValues[templateId]
-          if (existing) {
-            return { activeTemplateId: templateId }
-          }
-
+          // Compute full defaults for this template
           const defaults: FieldValues = {}
           for (const section of template.sections) {
             Object.assign(defaults, getDefaultValues(section.fields))
           }
 
+          // Merge: existing values win, but any missing keys get their default
+          // This handles new fields added to a template after first use
+          const existing = state.templateValues[templateId] ?? {}
+          const merged = { ...defaults, ...existing }
+
           return {
             activeTemplateId: templateId,
-            templateValues: { ...state.templateValues, [templateId]: defaults },
+            templateValues: { ...state.templateValues, [templateId]: merged },
           }
         })
       },
