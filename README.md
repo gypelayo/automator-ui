@@ -1,73 +1,34 @@
-# React + TypeScript + Vite
+# Automator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web app for building and filling structured prompt templates for AI tools.
 
-Currently, two official plugins are available:
+Instead of typing the same long, detailed prompt every time you use an AI assistant, you define a template once — a form with fields like sliders, toggles, dropdowns, and text inputs. You fill in the form, and Automator compiles it into a clean markdown prompt ready to paste into any AI tool.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**Live app:** https://gypelayo.github.io/automator-ui/
 
-## React Compiler
+## What it does
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Fill templates** — structured forms that compile to a markdown prompt
+- **Create templates** — build your own with a visual editor, no code needed
+- **Import / export** — share templates as JSON files
+- **Themes** — several colour themes to match your preference
 
-## Expanding the ESLint configuration
+## Use cases
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Travel planning prompts with destinations, budget, and preferences pre-filled
+- Code review or refactoring instructions with consistent structure
+- Any repetitive AI prompt that has configurable parameters
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Development
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+pnpm install
+pnpm dev        # starts the UI at http://localhost:5173
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Stack
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- React + TypeScript + Vite
+- Tailwind CSS
+- Zustand (state + localStorage persistence)
+- Monorepo with `packages/core` (shared types/compiler) and `packages/automator-ui` (the app)
