@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@theme {
+  --font-sans: 'Geist', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'Fira Code', monospace;
+}
+
 /* ============================================================
    BASE TOKEN MAPPING  (all themes use these var names)
    ============================================================ */
@@ -289,13 +294,4 @@
   font-display: swap;
 }
 
-/* ============================================================
-   FONTS  (body assignment)
-   ============================================================ */
-body {
-  font-family: 'Geist', system-ui, sans-serif;
-}
-
-code, .font-mono, .mono {
-  font-family: 'Geist Mono', 'Fira Code', monospace;
-}
+/* font-family handled by @theme --font-sans / --font-mono above */
