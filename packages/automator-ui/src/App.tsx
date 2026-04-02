@@ -8,6 +8,7 @@ import { LandingPage } from '@/components/layout/LandingPage'
 import { TemplateForm } from '@/components/builder/TemplateForm'
 import { TemplateBuilder } from '@/components/builder/TemplateBuilder'
 import { OutputPanel } from '@/components/output/OutputPanel'
+import { ChevronLeft } from 'lucide-react'
 
 // Register templates once at module level
 registerAllTemplates()
@@ -76,10 +77,9 @@ export default function App() {
     return <LandingPage />
   }
 
-  // Template selected → app layout with sidebar
+  // Template selected → full-width layout, no sidebar
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      <Sidebar />
 
       <main className="flex-1 min-w-0 flex flex-col">
         {/* Sticky top bar */}
@@ -91,6 +91,15 @@ export default function App() {
           }}
         >
           <div className="flex items-center gap-3 min-w-0">
+            <button
+              onClick={() => setActiveTemplate('')}
+              className="shrink-0 flex items-center gap-1 text-[11px] text-muted-foreground/60 hover:text-foreground transition-colors"
+              title="Back to home"
+            >
+              <ChevronLeft size={13} />
+              Home
+            </button>
+            <span className="text-border/50 text-xs">/</span>
             {template.icon && (
               <span className="text-lg leading-none shrink-0">{template.icon}</span>
             )}
