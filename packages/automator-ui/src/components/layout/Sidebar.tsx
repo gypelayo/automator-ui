@@ -25,7 +25,7 @@ export function Sidebar() {
 
   const coreTemplates = getCoreTemplates()
   const { templates: customTemplates, addTemplate, deleteTemplate } = useTemplateStore()
-  void customTemplates // subscribe so list re-renders on changes
+  void customTemplates
   const allTemplates = [...coreTemplates, ...useTemplateStore.getState().getAllTemplates()]
   const customIds = new Set(useTemplateStore.getState().getAllTemplates().map((t) => t.id))
   const { activeTemplateId, setActiveTemplate, setEditMode } = useConfigStore()
@@ -36,14 +36,12 @@ export function Sidebar() {
   function handleDelete(templateId: string) {
     if (!confirm('Delete this template? This cannot be undone.')) return
     deleteTemplate(templateId)
-    // If the deleted template was active, fall back to the first remaining one
     if (activeTemplateId === templateId) {
       const remaining = [...coreTemplates, ...useTemplateStore.getState().getAllTemplates()]
       setActiveTemplate(remaining[0]?.id ?? '')
     }
   }
 
-  // --- Import from JSON file ---
   function handleImportClick() {
     fileInputRef.current?.click()
   }
@@ -71,7 +69,6 @@ export function Sidebar() {
     e.target.value = ''
   }
 
-  // --- Export template as JSON ---
   function handleExport(templateId: string) {
     const all = [...coreTemplates, ...useTemplateStore.getState().getAllTemplates()]
     const template = all.find((t) => t.id === templateId)
@@ -92,7 +89,7 @@ export function Sidebar() {
       className={cn(
         'shrink-0 flex flex-col h-screen sticky top-0 transition-all duration-200',
         'border-r',
-        collapsed ? 'w-14' : 'w-60',
+        collapsed ? 'w-12' : 'w-56',
       )}
       style={{
         backgroundColor: 'hsl(var(--sidebar-bg))',
@@ -102,15 +99,20 @@ export function Sidebar() {
       {/* Header */}
       <div
         className={cn(
-          'flex items-center h-14 border-b',
-          collapsed ? 'justify-center px-0' : 'px-4 gap-2.5',
+          'flex items-center h-12 border-b shrink-0',
+          collapsed ? 'justify-center' : 'px-3 gap-2',
         )}
         style={{ borderColor: 'hsl(var(--sidebar-border))' }}
       >
         {!collapsed && (
           <>
-            <LayoutDashboard size={16} className="text-primary shrink-0" />
-            <span className="text-sm font-semibold text-foreground tracking-tight truncate">
+            <div
+              className="w-5 h-5 rounded flex items-center justify-center shrink-0"
+              style={{ backgroundColor: 'hsl(var(--primary))' }}
+            >
+              <LayoutDashboard size={11} style={{ color: 'hsl(var(--primary-foreground))' }} />
+            </div>
+            <span className="text-xs font-semibold tracking-widest uppercase text-foreground/70 truncate">
               Automator
             </span>
           </>
@@ -118,22 +120,23 @@ export function Sidebar() {
         <button
           onClick={() => setCollapsed((c) => !c)}
           className={cn(
-            'rounded p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors',
+            'rounded p-1 text-muted-foreground hover:text-foreground transition-colors',
             collapsed ? '' : 'ml-auto',
           )}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+          {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
         </button>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
+      <nav className="flex-1 overflow-y-auto py-2 px-1.5 space-y-px">
         {!collapsed && (
-          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest px-2 mb-2">
+          <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-[0.12em] px-2 pt-1 pb-2">
             Templates
           </p>
         )}
+
         {allTemplates.map((t) => {
           const active = activeTemplateId === t.id
           const isCustom = customIds.has(t.id)
@@ -143,44 +146,49 @@ export function Sidebar() {
                 onClick={() => setActiveTemplate(t.id)}
                 title={collapsed ? t.name : undefined}
                 className={cn(
-                  'w-full flex items-center rounded text-left transition-all duration-150',
-                  collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-3 py-2.5',
+                  'w-full flex items-center gap-2.5 rounded-md text-left transition-all duration-100',
+                  collapsed ? 'justify-center p-2.5' : 'px-2.5 py-2',
                   active
-                    ? 'bg-primary/15 text-primary border-l-2 border-primary'
-                    : 'text-muted-foreground hover:bg-accent hover:text-foreground border-l-2 border-transparent',
+                    ? 'text-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/60',
                 )}
+                style={
+                  active
+                    ? { backgroundColor: 'hsl(var(--primary) / 0.1)' }
+                    : {}
+                }
               >
-                {t.icon && <span className="text-base leading-none shrink-0">{t.icon}</span>}
+                {t.icon
+                  ? <span className="text-sm leading-none shrink-0">{t.icon}</span>
+                  : <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: active ? 'hsl(var(--primary))' : 'hsl(var(--border))' }} />
+                }
                 {!collapsed && (
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium truncate">{t.name}</p>
-                    <p className="text-[11px] truncate opacity-60 mt-0.5">{t.description}</p>
-                  </div>
+                  <span className="text-[13px] font-medium truncate leading-snug">{t.name}</span>
                 )}
               </button>
 
-              {/* Always-visible action row for custom templates */}
+              {/* Action row — custom templates only */}
               {isCustom && !collapsed && (
-                <div className="flex items-center gap-1 px-3 pb-1.5 -mt-1">
+                <div className="flex items-center gap-2.5 px-2.5 pb-1.5">
                   <button
                     onClick={() => handleExport(t.id)}
-                    className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                    className="flex items-center gap-1 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors"
                   >
-                    <Download size={10} /> Export
+                    <Download size={9} />Export
                   </button>
-                  <span className="text-muted-foreground/30">·</span>
+                  <span className="text-border">·</span>
                   <button
                     onClick={() => setEditMode(true, t.id)}
-                    className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                    className="flex items-center gap-1 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors"
                   >
-                    <Pencil size={10} /> Edit
+                    <Pencil size={9} />Edit
                   </button>
-                  <span className="text-muted-foreground/30">·</span>
+                  <span className="text-border">·</span>
                   <button
                     onClick={() => handleDelete(t.id)}
-                    className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-red-500 transition-colors"
+                    className="flex items-center gap-1 text-[10px] text-muted-foreground/70 hover:text-destructive transition-colors"
                   >
-                    <Trash2 size={10} /> Delete
+                    <Trash2 size={9} />Delete
                   </button>
                 </div>
               )}
@@ -190,27 +198,29 @@ export function Sidebar() {
 
         {/* Actions */}
         {!collapsed && (
-          <div className="pt-2 space-y-0.5">
+          <div className="pt-3 space-y-px">
+            <div
+              className="h-px w-full mb-2"
+              style={{ backgroundColor: 'hsl(var(--sidebar-border))' }}
+            />
             <button
               onClick={() => setEditMode(true, null)}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded text-left text-muted-foreground hover:bg-accent hover:text-foreground border border-dashed border-muted-foreground/30 transition-colors"
+              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-left text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors"
             >
-              <Plus size={13} />
-              <span className="text-xs font-medium">Create template</span>
+              <Plus size={12} />
+              <span className="text-xs">New template</span>
             </button>
-
             <button
               onClick={handleImportClick}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded text-left text-muted-foreground hover:bg-accent hover:text-foreground border border-dashed border-muted-foreground/30 transition-colors"
+              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-left text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors"
             >
-              <Upload size={13} />
-              <span className="text-xs font-medium">Import from JSON</span>
+              <Upload size={12} />
+              <span className="text-xs">Import JSON</span>
             </button>
           </div>
         )}
       </nav>
 
-      {/* Hidden file input */}
       <input
         ref={fileInputRef}
         type="file"
@@ -221,56 +231,57 @@ export function Sidebar() {
 
       {/* Footer */}
       <div
-        className="border-t"
+        className="border-t shrink-0"
         style={{ borderColor: 'hsl(var(--sidebar-border))' }}
       >
-        {/* Theme list */}
+        {/* Theme picker */}
         {themeOpen && !collapsed && (
           <div
-            className="px-2 py-2 space-y-0.5 border-b"
+            className="px-1.5 py-2 border-b"
             style={{ borderColor: 'hsl(var(--sidebar-border))' }}
           >
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest px-2 mb-2">
+            <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-[0.12em] px-2 pb-2">
               Theme
             </p>
-            {THEMES.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => { setTheme(t.id); setThemeOpen(false) }}
-                className={cn(
-                  'w-full flex items-center gap-2.5 px-2 py-1.5 rounded text-left transition-colors',
-                  theme === t.id
-                    ? 'bg-primary/15 text-primary'
-                    : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-                )}
-              >
-                <span className="flex shrink-0 gap-0.5 rounded overflow-hidden w-7 h-4 border border-border/50">
-                  <span className="flex-1" style={{ background: t.swatches[0] }} />
-                  <span className="flex-1" style={{ background: t.swatches[1] }} />
-                </span>
-                <span className="text-xs font-medium">{t.name}</span>
-                {theme === t.id && <span className="ml-auto text-[10px] text-primary font-mono">●</span>}
-              </button>
-            ))}
+            <div className="space-y-px">
+              {THEMES.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => { setTheme(t.id); setThemeOpen(false) }}
+                  className={cn(
+                    'w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-left transition-colors',
+                    theme === t.id
+                      ? 'text-primary'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/60',
+                  )}
+                  style={theme === t.id ? { backgroundColor: 'hsl(var(--primary) / 0.1)' } : {}}
+                >
+                  <span className="flex shrink-0 gap-px rounded-sm overflow-hidden w-6 h-3.5">
+                    <span className="flex-1" style={{ background: t.swatches[0] }} />
+                    <span className="flex-1" style={{ background: t.swatches[1] }} />
+                  </span>
+                  <span className="text-xs font-medium">{t.name}</span>
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Theme button */}
         <button
           onClick={() => setThemeOpen((o) => !o)}
           title="Change theme"
           className={cn(
-            'w-full flex items-center h-11 transition-colors hover:bg-accent hover:text-foreground',
-            collapsed ? 'justify-center px-0' : 'px-3 gap-2.5',
-            themeOpen ? 'text-primary' : 'text-muted-foreground',
+            'w-full flex items-center h-10 transition-colors hover:bg-accent/60',
+            collapsed ? 'justify-center' : 'px-3 gap-2.5',
+            themeOpen ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
           )}
         >
-          <Palette size={14} className="shrink-0" />
+          <Palette size={13} className="shrink-0" />
           {!collapsed && (
             <>
-              <span className="text-xs font-medium truncate">{activeTheme.name}</span>
+              <span className="text-xs truncate">{activeTheme.name}</span>
               <span
-                className="ml-auto w-2.5 h-2.5 rounded-full shrink-0 ring-1 ring-border"
+                className="ml-auto w-2 h-2 rounded-full shrink-0"
                 style={{ background: activeTheme.swatches[1] }}
               />
             </>

@@ -18,61 +18,76 @@ export function OutputPanel() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'context.md'
+    a.download = 'prompt.md'
     a.click()
     URL.revokeObjectURL(url)
   }, [markdown])
 
   if (!activeTemplateId) return null
 
-  const btnBase =
-    'inline-flex items-center gap-1.5 px-3 h-8 rounded text-xs font-medium transition-colors cursor-pointer border'
-
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5">
       <button
         onClick={copy}
-        className={btnBase}
-        style={{
-          backgroundColor: copied
-            ? 'hsl(var(--primary) / 0.15)'
-            : 'hsl(var(--background-2))',
-          borderColor: copied
-            ? 'hsl(var(--primary) / 0.4)'
-            : 'hsl(var(--border))',
-          color: copied ? 'hsl(var(--primary))' : 'hsl(var(--foreground))',
-        }}
+        className="inline-flex items-center gap-1.5 px-3 h-7 rounded-md text-[12px] font-medium transition-all cursor-pointer"
+        style={
+          copied
+            ? {
+                backgroundColor: 'hsl(var(--primary) / 0.12)',
+                border: '1px solid hsl(var(--primary) / 0.3)',
+                color: 'hsl(var(--primary))',
+              }
+            : {
+                backgroundColor: 'hsl(var(--primary))',
+                border: '1px solid hsl(var(--primary))',
+                color: 'hsl(var(--primary-foreground))',
+              }
+        }
       >
-        {copied
-          ? <Check size={13} />
-          : <Copy size={13} />}
-        {copied ? 'Copied' : 'Copy'}
+        {copied ? <Check size={12} /> : <Copy size={12} />}
+        {copied ? 'Copied' : 'Copy prompt'}
       </button>
 
       <button
         onClick={download}
-        className={btnBase}
+        title="Download as .md"
+        className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors cursor-pointer"
         style={{
-          backgroundColor: 'hsl(var(--background-2))',
-          borderColor: 'hsl(var(--border))',
-          color: 'hsl(var(--foreground))',
+          border: '1px solid hsl(var(--border))',
+          color: 'hsl(var(--muted-foreground))',
+          backgroundColor: 'transparent',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = 'hsl(var(--foreground))'
+          e.currentTarget.style.backgroundColor = 'hsl(var(--accent))'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = 'hsl(var(--muted-foreground))'
+          e.currentTarget.style.backgroundColor = 'transparent'
         }}
       >
-        <Download size={13} />
-        Export
+        <Download size={12} />
       </button>
 
       <button
         onClick={() => resetTemplate(activeTemplateId)}
         title="Reset to defaults"
-        className="inline-flex items-center justify-center w-8 h-8 rounded border transition-colors cursor-pointer"
+        className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors cursor-pointer"
         style={{
-          backgroundColor: 'hsl(var(--background-2))',
-          borderColor: 'hsl(var(--border))',
+          border: '1px solid hsl(var(--border))',
           color: 'hsl(var(--muted-foreground))',
+          backgroundColor: 'transparent',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = 'hsl(var(--foreground))'
+          e.currentTarget.style.backgroundColor = 'hsl(var(--accent))'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = 'hsl(var(--muted-foreground))'
+          e.currentTarget.style.backgroundColor = 'transparent'
         }}
       >
-        <RotateCcw size={13} />
+        <RotateCcw size={12} />
       </button>
     </div>
   )

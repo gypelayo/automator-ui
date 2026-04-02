@@ -25,57 +25,48 @@ function SectionGroup({ section, templateId, values }: SectionGroupProps) {
   }
 
   return (
-    <div
-      className="rounded-lg overflow-hidden border"
-      style={{
-        borderColor: 'hsl(var(--border))',
-        backgroundColor: 'hsl(var(--card))',
-      }}
-    >
+    <div className="rounded-lg overflow-hidden" style={{ border: '1px solid hsl(var(--border) / 0.7)' }}>
       {/* Section header */}
       <button
-        className="w-full flex items-center justify-between px-4 py-3 text-left transition-colors hover:bg-accent/40 group"
+        className="w-full flex items-center justify-between px-4 py-3 text-left group"
+        style={{ backgroundColor: 'hsl(var(--background-2) / 0.5)' }}
         onClick={() => setOpen((o) => !o)}
       >
-        <div className="flex items-center gap-3 min-w-0">
-          {/* Accent bar */}
+        <div className="flex items-center gap-2.5 min-w-0">
           <span
-            className="w-1 h-5 rounded-full shrink-0"
-            style={{
-              backgroundColor: open ? 'hsl(var(--primary))' : 'hsl(var(--border))',
-              transition: 'background-color 0.15s',
-            }}
+            className="w-0.5 h-4 rounded-full shrink-0 transition-colors duration-150"
+            style={{ backgroundColor: open ? 'hsl(var(--primary))' : 'hsl(var(--border))' }}
           />
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-foreground tracking-tight">
+            <p className="text-[13px] font-semibold text-foreground tracking-tight leading-snug">
               {section.title}
             </p>
             {section.description && (
-              <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+              <p className="text-[11px] text-muted-foreground/70 truncate leading-tight mt-0.5">
                 {section.description}
               </p>
             )}
           </div>
         </div>
-        <span className="text-muted-foreground shrink-0 ml-2 transition-transform duration-150" style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)' }}>
-          <ChevronDown size={15} />
-        </span>
+        <ChevronDown
+          size={14}
+          className="shrink-0 ml-3 text-muted-foreground/50 transition-transform duration-150"
+          style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+        />
       </button>
 
       {/* Fields */}
       {open && (
         <div
           className="border-t"
-          style={{ borderColor: 'hsl(var(--border))' }}
+          style={{ borderColor: 'hsl(var(--border) / 0.7)' }}
         >
           <div className="px-5 py-4 space-y-5">
             {section.fields.map((field, i) => (
               <div
                 key={field.id}
-                className={cn(
-                  i > 0 && 'pt-5 border-t',
-                )}
-                style={i > 0 ? { borderColor: 'hsl(var(--border) / 0.5)' } : {}}
+                className={cn(i > 0 && 'pt-5 border-t')}
+                style={i > 0 ? { borderColor: 'hsl(var(--border) / 0.4)' } : {}}
               >
                 {field.type === 'slider' && (
                   <SliderFieldComponent
@@ -145,7 +136,7 @@ export function TemplateForm({ sections, templateId }: TemplateFormProps) {
   const values = (templateValues[templateId] ?? {}) as Record<string, FieldValue>
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {sections.map((sec) => (
         <SectionGroup
           key={sec.id}
