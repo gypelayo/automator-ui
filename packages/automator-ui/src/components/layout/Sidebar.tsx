@@ -137,7 +137,7 @@ export function Sidebar() {
           const active = activeTemplateId === t.id
           const isCustom = t.id.startsWith('custom-')
           return (
-            <div key={t.id} className="group relative">
+            <div key={t.id}>
               <button
                 onClick={() => setActiveTemplate(t.id)}
                 title={collapsed ? t.name : undefined}
@@ -158,34 +158,29 @@ export function Sidebar() {
                 )}
               </button>
 
-              {/* Action icons on hover */}
-              {!collapsed && (
-                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              {/* Always-visible action row for custom templates */}
+              {isCustom && !collapsed && (
+                <div className="flex items-center gap-1 px-3 pb-1.5 -mt-1">
                   <button
-                    onClick={(e) => { e.stopPropagation(); handleExport(t.id) }}
-                    title="Export as JSON"
-                    className="p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => handleExport(t.id)}
+                    className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    <Download size={11} />
+                    <Download size={10} /> Export
                   </button>
-                  {isCustom && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setEditMode(true, t.id) }}
-                      title="Edit template"
-                      className="p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      <Pencil size={11} />
-                    </button>
-                  )}
-                  {isCustom && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleDelete(t.id) }}
-                      title="Delete template"
-                      className="p-1 rounded hover:bg-accent text-muted-foreground hover:text-red-500 transition-colors"
-                    >
-                      <Trash2 size={11} />
-                    </button>
-                  )}
+                  <span className="text-muted-foreground/30">·</span>
+                  <button
+                    onClick={() => setEditMode(true, t.id)}
+                    className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Pencil size={10} /> Edit
+                  </button>
+                  <span className="text-muted-foreground/30">·</span>
+                  <button
+                    onClick={() => handleDelete(t.id)}
+                    className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-red-500 transition-colors"
+                  >
+                    <Trash2 size={10} /> Delete
+                  </button>
                 </div>
               )}
             </div>
