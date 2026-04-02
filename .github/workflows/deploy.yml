@@ -33,24 +33,13 @@ jobs:
       - name: Build automator-ui
         run: pnpm --filter @automator/automator-ui build
 
-      # The app is built with base=/automator-ui/ so assets resolve correctly.
-      # Deployed at: https://gypelayo.github.io/automator-ui/
+      # The app is built with base=/automator-ui/ so all asset paths are already
+      # prefixed. Deploy dist/ directly as the pages root so the app is served
+      # at https://gypelayo.github.io/automator-ui/ without a double prefix.
       - name: Assemble pages artifact
         run: |
-          mkdir -p pages/automator-ui
-          cp -r packages/automator-ui/dist/* pages/automator-ui/
-          # Root index redirects straight to the app
-          cat > pages/index.html <<'EOF'
-          <!doctype html>
-          <html>
-            <head>
-              <meta charset="UTF-8" />
-              <meta http-equiv="refresh" content="0; url=./automator-ui/" />
-              <title>Automator</title>
-            </head>
-            <body>Redirecting...</body>
-          </html>
-          EOF
+          mkdir -p pages
+          cp -r packages/automator-ui/dist/* pages/
 
       - uses: actions/upload-pages-artifact@v3
         with:
