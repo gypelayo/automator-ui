@@ -12,6 +12,7 @@ import {
   Palette,
   Plus,
   Pencil,
+  Trash2,
   Upload,
   Download,
 } from 'lucide-react'
@@ -23,13 +24,23 @@ export function Sidebar() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const coreTemplates = getCoreTemplates()
-  const { templates: customTemplates, addTemplate } = useTemplateStore()
+  const { templates: customTemplates, addTemplate, deleteTemplate } = useTemplateStore()
   void customTemplates // subscribe so list re-renders on changes
   const allTemplates = [...coreTemplates, ...useTemplateStore.getState().getAllTemplates()]
   const { activeTemplateId, setActiveTemplate, setEditMode } = useConfigStore()
   const { theme, setTheme } = useThemeStore()
 
   const activeTheme = THEMES.find((t) => t.id === theme) ?? THEMES[0]
+
+  function handleDelete(templateId: string) {
+    if (!confirm('Delete this template? This cannot be undone.')) return
+    deleteTemplate(templateId)
+    // If the deleted template was active, fall back to the first remaining one
+    if (activeTemplateId === templateId) {
+      const remaining = [...coreTemplates, ...useTemplateStore.getState().getAllTemplates()]
+      setActiveTemplate(remaining[0]?.id ?? '')
+    }
+  }
 
   // --- Import from JSON file ---
   function handleImportClick() {
@@ -164,6 +175,15 @@ export function Sidebar() {
                       className="p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <Pencil size={11} />
+                    </button>
+                  )}
+                  {isCustom && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDelete(t.id) }}
+                      title="Delete template"
+                      className="p-1 rounded hover:bg-accent text-muted-foreground hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 size={11} />
                     </button>
                   )}
                 </div>
