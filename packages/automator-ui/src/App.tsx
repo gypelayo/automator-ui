@@ -3,7 +3,6 @@ import { registerAllTemplates } from '@/templates'
 import { getAllTemplates as getCoreTemplates, getTemplate as getCoreTemplate } from '@automator/core'
 import { useConfigStore } from '@/store/config'
 import { useTemplateStore } from '@/store/templates'
-import { Sidebar } from '@/components/layout/Sidebar'
 import { LandingPage } from '@/components/layout/LandingPage'
 import { TemplateForm } from '@/components/builder/TemplateForm'
 import { TemplateBuilder } from '@/components/builder/TemplateBuilder'
@@ -25,7 +24,7 @@ function getAllTemplates() {
 }
 
 export default function App() {
-  const { activeTemplateId, setActiveTemplate, isEditMode, editingTemplateId, setEditMode } = useConfigStore()
+  const { activeTemplateId, setActiveTemplate, goHome, isEditMode, editingTemplateId, setEditMode } = useConfigStore()
   useTemplateStore((state) => state.templates)
 
   // Clear stale activeTemplateId from localStorage if the template no longer exists
@@ -54,11 +53,10 @@ export default function App() {
     // If creating new was cancelled and no template was active, go back to landing
   }
 
-  // Edit mode: full-screen builder (no sidebar)
+  // Edit mode: full-screen builder, no sidebar
   if (isEditMode) {
     return (
-      <div className="flex min-h-screen bg-background text-foreground">
-        <Sidebar />
+      <div className="min-h-screen bg-background text-foreground">
         <main className="flex-1 overflow-y-auto px-6 py-6">
           <TemplateBuilder
             templateId={editingTemplateId || undefined}
@@ -92,7 +90,7 @@ export default function App() {
         >
           <div className="flex items-center gap-3 min-w-0">
             <button
-              onClick={() => setActiveTemplate('')}
+              onClick={goHome}
               className="shrink-0 flex items-center gap-1 text-[11px] text-muted-foreground/60 hover:text-foreground transition-colors"
               title="Back to home"
             >

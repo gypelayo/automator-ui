@@ -18,6 +18,7 @@ interface ConfigStore {
 
   // Actions
   setActiveTemplate: (templateId: string) => void
+  goHome: () => void
   setFieldValue: (templateId: string, fieldId: string, value: FieldValue) => void
   resetTemplate: (templateId: string) => void
   setEditMode: (isEditing: boolean, templateId?: string | null) => void
@@ -67,6 +68,10 @@ export const useConfigStore = create<ConfigStore>()(
             templateValues: { ...state.templateValues, [templateId]: merged },
           }
         })
+      },
+
+      goHome: () => {
+        set({ activeTemplateId: null, isEditMode: false, editingTemplateId: null })
       },
 
       setFieldValue: (templateId, fieldId, value) => {
@@ -128,7 +133,7 @@ export const useConfigStore = create<ConfigStore>()(
           state.activeTemplateId &&
           !templates.find((t) => t.id === state.activeTemplateId)
         ) {
-          state.activeTemplateId = templates[0]?.id ?? null
+          state.activeTemplateId = null
         }
       },
     },
