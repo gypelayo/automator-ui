@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -272,12 +271,31 @@
 }
 
 /* ============================================================
-   FONTS
+   FONTS  (self-hosted via geist npm package, no network request)
+   ============================================================ */
+@font-face {
+  font-family: 'Geist';
+  src: url('/automator-ui/fonts/Geist-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/automator-ui/fonts/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================
+   FONTS  (body assignment)
    ============================================================ */
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Geist', system-ui, sans-serif;
 }
 
 code, .font-mono, .mono {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: 'Geist Mono', 'Fira Code', monospace;
 }
