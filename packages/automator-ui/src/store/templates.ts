@@ -1,6 +1,14 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Template, FieldSchema, SectionSchema, FieldValues, FieldValue } from '@automator/core'
+import { createTemplateRender } from '@automator/core'
+
+/** Re-attach render functions to persisted templates that lost them through JSON serialisation */
+function rehydrateTemplates(templates: Template[]): Template[] {
+  return templates.map((t) =>
+    typeof t.render === 'function' ? t : { ...t, render: createTemplateRender(t) }
+  )
+}
 
 interface TemplateStore {
   templates: Template[]
@@ -179,6 +187,10 @@ export const useTemplateStore = create<TemplateStore>()(
     }),
     {
       name: 'automator-templates',
+      onRehydrateStorage: () => (state) => {
+        if (!state) return
+        state.templates = rehydrateTemplates(state.templates)
+      },
     }
   )
 )

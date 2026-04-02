@@ -1,4 +1,4 @@
-import type { FieldSchema, FieldValues, FieldValue, BudgetEntry } from './types'
+import type { FieldSchema, FieldValues, FieldValue, BudgetEntry, TemplateDefinition, Template } from './types'
 
 /** Returns the default values for a list of field schemas */
 export function getDefaultValues(fields: FieldSchema[]): FieldValues {
@@ -99,4 +99,33 @@ export function compileFields(
   }
 
   return lines.join('\n')
+}
+
+/**
+ * A generic render function used for AI-generated / imported templates.
+ * Iterates every section and field and emits clean markdown.
+ */
+export function genericRender(
+  sections: TemplateDefinition['sections'],
+  values: FieldValues,
+): string {
+  const lines: string[] = []
+  for (const sec of sections) {
+    const body = compileFields(sec.fields, values)
+    if (body.trim()) {
+      lines.push(section(sec.title, body))
+    }
+  }
+  return lines.join('\n')
+}
+
+/**
+ * Hydrates a TemplateDefinition (JSON-serialisable) into a full Template
+ * with a generic render function.
+ */
+export function templateFromDefinition(def: TemplateDefinition): Template {
+  return {
+    ...def,
+    render: (values: FieldValues) => genericRender(def.sections, values),
+  }
 }

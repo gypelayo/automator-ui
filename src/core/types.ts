@@ -124,3 +124,15 @@ export type SavedConfig = {
   values: FieldValues
   savedAt: string
 }
+
+// --- Portable template definition (JSON-serialisable, no render fn) ----------
+
+/** The shape that can be saved to / loaded from a JSON file or API response.
+ *  The `render` function is derived at runtime via `genericRender`. */
+export type TemplateDefinition = {
+  id: string
+  name: string
+  description: string
+  icon?: string
+  sections: SectionSchema[]
+}

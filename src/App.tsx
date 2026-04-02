@@ -2,12 +2,17 @@ import { useEffect } from 'react'
 import { registerAllTemplates } from '@/templates'
 import { getAllTemplates, getTemplate } from '@/core/registry'
 import { useConfigStore } from '@/store/config'
+import { useImportedTemplatesStore } from '@/store/importedTemplates'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TemplateForm } from '@/components/builder/TemplateForm'
 import { OutputPanel } from '@/components/output/OutputPanel'
 
-// Register templates once at module level
+// Register built-in templates once at module level
 registerAllTemplates()
+
+// Eagerly hydrate imported templates so they are in the registry
+// before the config store rehydration checks activeTemplateId
+useImportedTemplatesStore.getState()
 
 export default function App() {
   const { activeTemplateId, setActiveTemplate } = useConfigStore()
