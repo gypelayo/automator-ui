@@ -27,6 +27,7 @@ export function Sidebar() {
   const { templates: customTemplates, addTemplate, deleteTemplate } = useTemplateStore()
   void customTemplates // subscribe so list re-renders on changes
   const allTemplates = [...coreTemplates, ...useTemplateStore.getState().getAllTemplates()]
+  const customIds = new Set(useTemplateStore.getState().getAllTemplates().map((t) => t.id))
   const { activeTemplateId, setActiveTemplate, setEditMode } = useConfigStore()
   const { theme, setTheme } = useThemeStore()
 
@@ -135,7 +136,7 @@ export function Sidebar() {
         )}
         {allTemplates.map((t) => {
           const active = activeTemplateId === t.id
-          const isCustom = t.id.startsWith('custom-')
+          const isCustom = customIds.has(t.id)
           return (
             <div key={t.id}>
               <button
