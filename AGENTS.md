@@ -10,7 +10,7 @@ Read this first. It will save you many tool calls.
 A web app that lets users configure **templates** — structured forms whose field values
 compile to a markdown prompt that is sent to an AI orchestrator or copied manually.
 There are two built-in templates (Travel Planner, Infra Monitor) and a full system for
-creating, importing, and syncing custom templates.
+creating, importing, and exporting custom templates.
 
 Deployed at: **https://gypelayo.github.io/automator-ui/**
 
@@ -22,7 +22,7 @@ Deployed at: **https://gypelayo.github.io/automator-ui/**
 packages/
   core/          — shared types, compiler helpers, template registry (no React)
   automator-ui/  — the React app (Vite + Tailwind + Zustand)
-  api/           — local Hono server; agents POST templates here, UI polls it
+  api/           — local Hono server for the /run SSE orchestration endpoint
 ```
 
 Root `package.json` scripts:
@@ -105,7 +105,7 @@ Built-in templates are registered at app startup in
 ### Directory structure
 
 ```
-App.tsx                   — root component; mounts useAgentSync
+App.tsx                   — root component
 templates/
   index.ts                — calls registerTemplate for all built-ins
   travel/index.ts         — Travel Planner template (custom render fn)
@@ -113,12 +113,9 @@ templates/
 store/
   config.ts               — active template, field values, edit mode (persisted)
   templates.ts            — custom templates CRUD + rehydration (persisted)
-  agent.ts                — agent URL + poll interval (persisted)
   theme.ts                — active theme (persisted)
-hooks/
-  useAgentSync.ts         — polls agentUrl/templates every pollInterval ms
 components/
-  layout/Sidebar.tsx      — template list, create/import/export, agent config
+  layout/Sidebar.tsx      — template list, create/import/export, theme picker
   builder/
     TemplateForm.tsx      — renders a template's sections as live form
     TemplateBuilder.tsx   — UI for creating/editing custom templates manually
@@ -135,22 +132,12 @@ All stores use `zustand/middleware/persist` → localStorage.
 |-------|-----|--------------|
 | `useConfigStore` | `automator-ui-config` | `activeTemplateId`, `templateValues`, `isEditMode`, `editingTemplateId` |
 | `useTemplateStore` | `automator-templates` | `templates: Template[]` (custom only; built-ins are in the core registry) |
-| `useAgentStore` | `automator-agent-config` | `agentUrl: string`, `pollInterval: number` |
 | `useThemeStore` | `automator-theme` | `theme: ThemeId` |
 
 **Important:** `Template.render` is a function and is lost on JSON serialisation.
 `useTemplateStore` re-attaches it via `createTemplateRender` in `onRehydrateStorage`.
 When you add a template programmatically always go through `useTemplateStore.addTemplate`
 (never push directly into the array) so this is handled correctly.
-
-### Agent sync flow
-
-1. User pastes agent base URL into sidebar → saved in `useAgentStore.agentUrl`
-2. `useAgentSync` (mounted in `App.tsx`) polls `GET {agentUrl}/templates` every
-   `pollInterval` ms (default 5 s)
-3. New templates are added; changed templates (name/description/icon/sections differ)
-   are updated via `updateTemplate`
-4. Network errors are silently swallowed — the agent may not be running
 
 ### How templates compile to markdown
 
@@ -189,33 +176,7 @@ GET  /health                    → { ok: true }
 POST /run                       → SSE stream; body: { compiledMarkdown }
                                   orchestrates a travel plan via OpenAI + Amadeus
                                   rate-limited to 5 req/IP/hour
-
-GET    /templates               → TemplateDefinition[]  (in-memory store)
-GET    /templates/:id           → TemplateDefinition
-POST   /templates               → create/overwrite; body: TemplateDefinition
-PUT    /templates/:id           → partial update
-DELETE /templates/:id           → remove
 ```
-
-**TemplateDefinition** (what the agent POSTs — no `render` fn):
-```json
-{
-  "id": "kebab-case-id",
-  "name": "Human Readable Name",
-  "description": "One sentence.",
-  "icon": "🛠️",
-  "sections": [
-    {
-      "id": "section-id",
-      "title": "Section Title",
-      "description": "optional",
-      "fields": [ ...FieldSchema objects... ]
-    }
-  ]
-}
-```
-
-The UI generates `render` automatically from sections using `createTemplateRender`.
 
 ### CORS
 
@@ -250,9 +211,8 @@ The sidebar picks it up automatically — no other changes needed.
 
 GitHub Actions (`.github/workflows/deploy.yml`) triggers on push to `main`:
 1. Builds `@automator/automator-ui` (vite base = `/automator-ui/`)
-2. Copies `dist/` to `pages/automator-ui/`
-3. Writes a root `pages/index.html` that redirects to `/automator-ui/`
-4. Uploads `pages/` as the GitHub Pages artifact
+2. Copies `dist/` to the pages root
+3. Uploads `pages/` as the GitHub Pages artifact
 
 Final URL: `https://gypelayo.github.io/automator-ui/`
 
@@ -265,7 +225,6 @@ Final URL: `https://gypelayo.github.io/automator-ui/`
 | Change a built-in template's fields | `packages/automator-ui/src/templates/<name>/index.ts` |
 | Change how markdown is compiled | `packages/core/src/compiler.ts` → `compileFields` |
 | Add a sidebar button | `packages/automator-ui/src/components/layout/Sidebar.tsx` |
-| Change polling interval default | `packages/automator-ui/src/store/agent.ts` |
 | Add an API route | `packages/api/src/routes/` + register in `packages/api/src/index.ts` |
 | Modify theme colours | `packages/automator-ui/src/index.css` (CSS variable blocks per theme) |
 | Change the page `<title>` or favicon | `packages/automator-ui/index.html` |

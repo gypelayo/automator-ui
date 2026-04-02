@@ -3,7 +3,6 @@ import { registerAllTemplates } from '@/templates'
 import { getAllTemplates as getCoreTemplates, getTemplate as getCoreTemplate } from '@automator/core'
 import { useConfigStore } from '@/store/config'
 import { useTemplateStore } from '@/store/templates'
-import { useAgentSync } from '@/hooks/useAgentSync'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TemplateForm } from '@/components/builder/TemplateForm'
 import { TemplateBuilder } from '@/components/builder/TemplateBuilder'
@@ -26,8 +25,6 @@ function getAllTemplates() {
 export default function App() {
   const { activeTemplateId, setActiveTemplate, isEditMode, editingTemplateId, setEditMode } = useConfigStore()
   useTemplateStore((state) => state.templates)
-  useAgentSync()
-
   useEffect(() => {
     const templates = getAllTemplates()
     if (!activeTemplateId && templates[0]) {

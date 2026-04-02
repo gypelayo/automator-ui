@@ -3,7 +3,6 @@ import { getAllTemplates as getCoreTemplates } from '@automator/core'
 import { createTemplateRender } from '@automator/core'
 import { useConfigStore } from '@/store/config'
 import { useTemplateStore } from '@/store/templates'
-import { useAgentStore } from '@/store/agent'
 import { useThemeStore, THEMES } from '@/store/theme'
 import { cn } from '@/lib/utils'
 import {
@@ -15,17 +14,12 @@ import {
   Pencil,
   Upload,
   Download,
-  Bot,
-  Check,
-  X,
 } from 'lucide-react'
 import type { Template } from '@automator/core'
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const [themeOpen, setThemeOpen] = useState(false)
-  const [agentOpen, setAgentOpen] = useState(false)
-  const [agentUrlDraft, setAgentUrlDraft] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const coreTemplates = getCoreTemplates()
@@ -33,21 +27,9 @@ export function Sidebar() {
   void customTemplates // subscribe so list re-renders on changes
   const allTemplates = [...coreTemplates, ...useTemplateStore.getState().getAllTemplates()]
   const { activeTemplateId, setActiveTemplate, setEditMode } = useConfigStore()
-  const { agentUrl, setAgentUrl } = useAgentStore()
   const { theme, setTheme } = useThemeStore()
 
   const activeTheme = THEMES.find((t) => t.id === theme) ?? THEMES[0]
-  const agentConnected = !!agentUrl
-
-  function openAgentPanel() {
-    setAgentUrlDraft(agentUrl)
-    setAgentOpen(true)
-  }
-
-  function saveAgentUrl() {
-    setAgentUrl(agentUrlDraft)
-    setAgentOpen(false)
-  }
 
   // --- Import from JSON file ---
   function handleImportClick() {
@@ -221,44 +203,6 @@ export function Sidebar() {
         onChange={handleFileChange}
       />
 
-      {/* Agent config panel */}
-      {agentOpen && !collapsed && (
-        <div
-          className="border-t px-3 py-3 space-y-2"
-          style={{ borderColor: 'hsl(var(--sidebar-border))' }}
-        >
-          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
-            Agent endpoint
-          </p>
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            Point your local agent here. It can POST/PUT/DELETE to <code className="font-mono">/templates</code> and the UI will sync automatically.
-          </p>
-          <input
-            type="url"
-            value={agentUrlDraft}
-            onChange={(e) => setAgentUrlDraft(e.target.value)}
-            placeholder="http://localhost:3000"
-            className="w-full text-xs px-2 py-1.5 rounded border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-            style={{ borderColor: 'hsl(var(--border))' }}
-            onKeyDown={(e) => { if (e.key === 'Enter') saveAgentUrl() }}
-          />
-          <div className="flex gap-1.5">
-            <button
-              onClick={saveAgentUrl}
-              className="flex-1 flex items-center justify-center gap-1.5 h-7 rounded text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-            >
-              <Check size={12} /> Save
-            </button>
-            <button
-              onClick={() => setAgentOpen(false)}
-              className="w-7 h-7 flex items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-            >
-              <X size={12} />
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Footer */}
       <div
         className="border-t"
@@ -295,39 +239,15 @@ export function Sidebar() {
           </div>
         )}
 
-        {/* Agent button */}
-        <button
-          onClick={openAgentPanel}
-          title={agentConnected ? `Agent: ${agentUrl}` : 'Connect agent'}
-          className={cn(
-            'w-full flex items-center h-11 transition-colors hover:bg-accent hover:text-foreground',
-            collapsed ? 'justify-center px-0' : 'px-3 gap-2.5',
-            agentOpen || agentConnected ? 'text-primary' : 'text-muted-foreground',
-          )}
-        >
-          <Bot size={14} className="shrink-0" />
-          {!collapsed && (
-            <>
-              <span className="text-xs font-medium truncate">
-                {agentConnected ? 'Agent connected' : 'Connect agent'}
-              </span>
-              {agentConnected && (
-                <span className="ml-auto w-2 h-2 rounded-full bg-green-500 shrink-0" />
-              )}
-            </>
-          )}
-        </button>
-
         {/* Theme button */}
         <button
           onClick={() => setThemeOpen((o) => !o)}
           title="Change theme"
           className={cn(
-            'w-full flex items-center h-11 transition-colors hover:bg-accent hover:text-foreground border-t',
+            'w-full flex items-center h-11 transition-colors hover:bg-accent hover:text-foreground',
             collapsed ? 'justify-center px-0' : 'px-3 gap-2.5',
             themeOpen ? 'text-primary' : 'text-muted-foreground',
           )}
-          style={{ borderColor: 'hsl(var(--sidebar-border))' }}
         >
           <Palette size={14} className="shrink-0" />
           {!collapsed && (
